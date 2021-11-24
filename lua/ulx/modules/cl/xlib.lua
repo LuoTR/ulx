@@ -23,7 +23,7 @@ function xlib.makecheckbox( t )
 	if not t.tooltipwidth then t.tooltipwidth = 250 end
 	if t.tooltip then
 		if t.tooltipwidth ~= 0 then
-			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" )
+			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" ) --TODO: Find out what does this do
 		end
 		pnl:SetTooltip( t.tooltip )
 	end
@@ -72,7 +72,7 @@ function xlib.makelabel( t )
 	if not t.tooltipwidth then t.tooltipwidth = 250 end
 	if t.tooltip then
 		if t.tooltipwidth ~= 0 then
-			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" )
+			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" ) --TODO: Find out what does this do
 		end
 		pnl:SetTooltip( t.tooltip )
 		pnl:SetMouseInputEnabled( true )
@@ -80,7 +80,7 @@ function xlib.makelabel( t )
 
 	if t.font then pnl:SetFont( t.font ) end
 	if t.w and t.wordwrap then
-		pnl:SetText( xlib.wordWrap( t.label, t.w, t.font or "Default" ) )
+		pnl:SetText( xlib.wordWrap( t.label, t.w, t.font or "Default" ) ) --TODO: Find out what does this do
 	end
 	pnl:SizeToContents()
 	if t.w then pnl:SetWidth( t.w ) end
@@ -135,7 +135,7 @@ function xlib.makebutton( t )
 	if not t.tooltipwidth then t.tooltipwidth = 250 end
 	if t.tooltip then
 		if t.tooltipwidth ~= 0 then
-			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" )
+			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" ) --TODO: Find out what does this do
 		end
 		pnl:SetTooltip( t.tooltip )
 		pnl:SetMouseInputEnabled( true )
@@ -190,7 +190,7 @@ function xlib.maketextbox( t )
 	if not t.tooltipwidth then t.tooltipwidth = 250 end
 	if t.tooltip then
 		if t.tooltipwidth ~= 0 then
-			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" )
+			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" ) --TODO: Find out what does this do
 		end
 		pnl:SetTooltip( t.tooltip )
 	end
@@ -358,7 +358,7 @@ function xlib.makecombobox( t )
 	if not t.tooltipwidth then t.tooltipwidth = 250 end
 	if t.tooltip then
 		if t.tooltipwidth ~= 0 then
-			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" )
+			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" ) --TODO: Find out what does this do
 		end
 		pnl:SetTooltip( t.tooltip )
 	end
@@ -405,14 +405,14 @@ function xlib.makecombobox( t )
 			if tonumber( cvar ) and cvar + t.numOffset <= #pnl.Choices and cvar + t.numOffset > 0 then
 				pnl:ChooseOptionID( cvar + t.numOffset )
 			else
-				pnl:SetText( "Invalid Convar Value" )
+				pnl:SetText( "无效控制台参数值" )
 			end
 			function pnl.ConVarUpdated( sv_cvar, cl_cvar, ply, old_val, new_val )
 				if cl_cvar == t.repconvar:lower() then
 					if tonumber( new_val ) and new_val + t.numOffset <= #pnl.Choices and new_val + t.numOffset > 0 then
 						pnl:ChooseOptionID( new_val + t.numOffset )
 					else
-						pnl:SetText( "Invalid Convar Value" )
+						pnl:SetText( "无效控制台参数值" )
 					end
 				end
 			end
@@ -430,7 +430,7 @@ function xlib.makecombobox( t )
 			end
 			hook.Add( "ULibReplicatedCvarChanged", "XLIB_" .. t.repconvar, pnl.ConVarUpdated )
 			function pnl:OnSelect( index, value )
-				if t.convarblanklabel and value == "<not specified>" then value = "" end
+				if t.convarblanklabel and value == "<未指定>" then value = "" end
 				RunConsoleCommand( t.repconvar, value )
 			end
 		end
@@ -558,7 +558,7 @@ function xlib.makeslider( t )
 	if not t.tooltipwidth then t.tooltipwidth = 250 end
 	if t.tooltip then
 		if t.tooltipwidth ~= 0 then
-			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" )
+			t.tooltip = xlib.wordWrap( t.tooltip, t.tooltipwidth, "Default" ) --TODO: Find out what does this do
 		end
 		pnl:SetTooltip( t.tooltip )
 	end
@@ -1155,7 +1155,7 @@ xlib.addToAnimQueue = function( obj, ... )
 		xlib.animStep = xlib.animStep + 1
 		table.insert( outTable, function() xlib.animRunning = xlib.animTypes[obj]  xlib.animRunning:Start( ( xlib.curAnimStep ~= -1 and ( length/xlib.curAnimStep ) or 0 ), arg[1] ) end )
 	else
-		Msg( "Error: XLIB recieved an invalid animation call! TYPE:" .. type( obj ) .. " VALUE:" .. tostring( obj ) .. "\n" )
+		Msg( "错误: XLIB收到了无效的动画调用！ TYPE:" .. type( obj ) .. " VALUE:" .. tostring( obj ) .. "\n" )
 	end
 end
 

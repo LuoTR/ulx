@@ -155,11 +155,11 @@ function xgui.load_helpers()
 		function xgui.chunkbox:Progress( datatype )
 			self.value = self.value + 1
 			self:SetFraction( self.value / self.max )
-			self.Label:SetText( "Getting data: " .. datatype .. " - " .. string.format("%.2f", (self.value / self.max) * 100) .. "%" )
+			self.Label:SetText( "获取数据: " .. datatype .. " - " .. string.format("%.2f", (self.value / self.max) * 100) .. "%" )
 			if self.value == self.max then
 				xgui.dataInitialized = true
 				xgui.expectingdata = nil
-				self.Label:SetText( "Waiting for clientside processing..." )
+				self.Label:SetText( "等待客户端处理..." )
 				xgui.queueFunctionCall( xgui.chunkbox.SetVisible, "chunkbox", xgui.chunkbox, false )
 				RunConsoleCommand( "_xgui", "dataComplete" )
 			end
@@ -180,7 +180,7 @@ function xgui.load_helpers()
 				if stack[1] ~= nil then
 					local b, e = pcall( stack[ 1 ].fn, unpack( stack[ 1 ], 1, stack[ 1 ].n ) )
 					if not b then
-						ErrorNoHalt( "XGUI queue error: " .. tostring( e ) .. "\n" )
+						ErrorNoHalt( "XGUI队列错误: " .. tostring( e ) .. "\n" )
 					end
 				end
 			table.remove( stack, 1 ) -- Remove the first inserted item. This is FIFO
@@ -192,7 +192,7 @@ function xgui.load_helpers()
 
 	function xgui.queueFunctionCall( fn, tag, ... )
 		if type( fn ) ~= "function" then
-			error( "queueFunctionCall received a bad function", 2 )
+			error( "queueFunctionCall收到了错误函数", 2 )
 			return
 		end
 
@@ -223,7 +223,7 @@ function xgui.load_helpers()
 
 	--Load control interpretations for ULib argument types
 	function ULib.cmds.BaseArg.x_getcontrol( arg, argnum, parent )
-		return xlib.makelabel{ label="Not Supported", parent=parent }
+		return xlib.makelabel{ label="不支持", parent=parent }
 	end
 
 	function ULib.cmds.NumArg.x_getcontrol( arg, argnum, parent )
@@ -236,21 +236,21 @@ function xgui.load_helpers()
 			local max = restrictions.max or 10 * 60 * 24 * 365 --default slider max 10 years
 
 			local outPanel = xlib.makepanel{ h=40, parent=parent }
-			xlib.makelabel{ x=5, y=3, label="Ban Length:", parent=outPanel }
+			xlib.makelabel{ x=5, y=3, label="无效长度:", parent=outPanel }
 			outPanel.interval = xlib.makecombobox{ x=90, w=75, parent=outPanel }
 			outPanel.val = xlib.makeslider{ w=165, y=20, label="<--->", min=min, max=max, value=min, decimal=0, parent=outPanel }
 
 			local divisor = {}
 			local sensiblemax = {}
-			if min == 0 then outPanel.interval:AddChoice( "Permanent" ) table.insert( divisor, 1 ) table.insert( sensiblemax, 0 ) end
-			if max >= 1 and min <= 60*24 then outPanel.interval:AddChoice( "Minutes" ) table.insert( divisor, 1 ) table.insert( sensiblemax, 60*24 ) end
-			if max >= 60 and min <= 60*24*7 then outPanel.interval:AddChoice( "Hours" ) table.insert( divisor, 60 ) table.insert( sensiblemax, 24*7 ) end
-			if max >= ( 60*24 ) and min <= 60*24*120 then outPanel.interval:AddChoice( "Days" ) table.insert( divisor, 60*24 ) table.insert( sensiblemax, 120 ) end
-			if max >= ( 60*24*7 ) and min <= 60*24*7*52 then outPanel.interval:AddChoice( "Weeks" ) table.insert( divisor, 60*24*7 ) table.insert( sensiblemax, 52 ) end
-			if max >= ( 60*24*365 ) then outPanel.interval:AddChoice( "Years" ) table.insert( divisor, 60*24*365 ) table.insert( sensiblemax, 10 ) end
+			if min == 0 then outPanel.interval:AddChoice( "永久" ) table.insert( divisor, 1 ) table.insert( sensiblemax, 0 ) end
+			if max >= 1 and min <= 60*24 then outPanel.interval:AddChoice( "分钟" ) table.insert( divisor, 1 ) table.insert( sensiblemax, 60*24 ) end
+			if max >= 60 and min <= 60*24*7 then outPanel.interval:AddChoice( "小时" ) table.insert( divisor, 60 ) table.insert( sensiblemax, 24*7 ) end
+			if max >= ( 60*24 ) and min <= 60*24*120 then outPanel.interval:AddChoice( "天" ) table.insert( divisor, 60*24 ) table.insert( sensiblemax, 120 ) end
+			if max >= ( 60*24*7 ) and min <= 60*24*7*52 then outPanel.interval:AddChoice( "星期" ) table.insert( divisor, 60*24*7 ) table.insert( sensiblemax, 52 ) end
+			if max >= ( 60*24*365 ) then outPanel.interval:AddChoice( "年" ) table.insert( divisor, 60*24*365 ) table.insert( sensiblemax, 10 ) end
 
 			outPanel.interval.OnSelect = function( self, index, value, data )
-				outPanel.val:SetDisabled( value == "Permanent" )
+				outPanel.val:SetDisabled( value == "永久" )
 				outPanel.val.maxvalue = math.min( max / divisor[index], sensiblemax[index] )
 				outPanel.val.minvalue = math.max( min / divisor[index], 0 )
 				outPanel.val:SetMax( outPanel.val.maxvalue )
@@ -316,7 +316,7 @@ function xgui.load_helpers()
 			end
 
 			local outPanel = xlib.makepanel{ h=35, parent=parent }
-			xlib.makelabel{ label=arg.hint or "NumArg", parent=outPanel }
+			xlib.makelabel{ label=arg.hint or "数字", parent=outPanel }
 			outPanel.val = xlib.makeslider{ y=15, w=165, min=minvalue, max=maxvalue, value=defvalue, decimal=decimal, label="<--->", parent=outPanel }
 			outPanel.GetValue = function( self ) return outPanel.val.GetValue( outPanel.val ) end
 			outPanel.TextArea = outPanel.val.TextArea
@@ -328,22 +328,22 @@ function xgui.load_helpers()
 		if arg == nil or arg == "" then return nil, nil end
 
 		if arg == 0 or tonumber( arg ) == 0 then
-			return "Permanent", 0
+			return "永久", 0
 		end
 
 		local charPriority = { "y", "w", "d", "h" }
-		local charMap = { "Years", "Weeks", "Days", "Hours" }
+		local charMap = { "年", "星期", "天", "小时" }
 		local divisor = { 60 * 24 * 365, 60 * 24 * 7, 60 * 24, 60 }
 		for i, v in ipairs( charPriority ) do
 			if arg:find( v, 1, true ) then
 				if not charMap[ i ] or not divisor [ i ] or not ULib.stringTimeToMinutes( arg ) then return nil, nil end
 				local val = ULib.stringTimeToMinutes( arg ) / divisor[ i ]
-				if val == 0 then return "Permanent", 0 end
+				if val == 0 then return "永久", 0 end
 				return charMap[ i ], val
 			end
 		end
 
-		return "Minutes", ULib.stringTimeToMinutes( arg )
+		return "分钟", ULib.stringTimeToMinutes( arg )
 	end
 
 
@@ -356,7 +356,7 @@ function xgui.load_helpers()
 			or restrictions.playerLevelRestriction -- The player's tag specifies only certain strings
 
 		if is_restricted_to_completes then
-			return xlib.makecombobox{ text=arg.hint or "StringArg", choices=restrictions.restrictedCompletes, parent=parent }
+			return xlib.makecombobox{ text=arg.hint or "字符串", choices=restrictions.restrictedCompletes, parent=parent }
 		elseif restrictions.restrictedCompletes and table.Count( restrictions.restrictedCompletes ) > 0 then
 			-- This is where there needs to be both a drop down AND an input box
 			local outPanel = xlib.makecombobox{ text=arg.hint, choices=restrictions.restrictedCompletes, enableinput=true, selectall=true, parent=parent }
@@ -365,7 +365,7 @@ function xgui.load_helpers()
 			end
 			return outPanel
 		else
-			return xlib.maketextbox{ text=arg.hint or "StringArg", selectall=true, parent=parent }
+			return xlib.maketextbox{ text=arg.hint or "字符串", selectall=true, parent=parent }
 		end
 	end
 
@@ -389,7 +389,7 @@ function xgui.load_helpers()
 	end
 
 	function ULib.cmds.CallingPlayerArg.x_getcontrol( arg, argnum, parent )
-		return xlib.makelabel{ label=arg.hint or "CallingPlayer", parent=parent }
+		return xlib.makelabel{ label=arg.hint or "玩家", parent=parent }
 	end
 
 	function ULib.cmds.BoolArg.x_getcontrol( arg, argnum, parent )
@@ -397,7 +397,7 @@ function xgui.load_helpers()
 		local restrictions = {}
 		ULib.cmds.BoolArg.processRestrictions( restrictions, arg, ulx.getTagArgNum( tag, argnum ) )
 
-		local outPanel = xlib.makecheckbox{ label=arg.hint or "BoolArg", value=restrictions.restrictedTo, parent=parent }
+		local outPanel = xlib.makecheckbox{ label=arg.hint or "布尔值", value=restrictions.restrictedTo, parent=parent }
 		if restrictions.restrictedTo ~= nil then outPanel:SetDisabled( true ) end
 		outPanel.GetValue = function( self )
 			return self:GetChecked() and 1 or 0

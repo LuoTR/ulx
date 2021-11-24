@@ -23,7 +23,7 @@ function ulx.showMotdMenu( steamid )
 	--html:SetAllowLua( true ) -- Too much of a security risk for us to enable. Feel free to uncomment if you know what you're doing.
 
 	local button = vgui.Create( "DButton", window )
-	button:SetText( "Close" )
+	button:SetText( "关闭" )
 	button.DoClick = function() window:Close() end
 	button:SetSize( 100, 40 )
 	button:SetPos( (window:GetWide() - button:GetWide()) / 2, window:GetTall() - button:GetTall() - 10 )
@@ -167,17 +167,17 @@ local template_item_br = [[
 ]]
 
 local template_item_addon = [[
-						<li><b>%title%</b> by %author%</li>
+						<li>由%author%制作的<b>%title%</b></li>
 ]]
 
 local template_item_workshop = [[
-						<li><b>%title%</b> - <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=%workshop_id%">View on Workshop</a></li>
+						<li><b>%title%</b> - <a href="http://steamcommunity.com/sharedfiles/filedetails/?id=%workshop_id%">在创意工坊上查看</a></li>
 ]]
 
 local template_footer = [[
 			</div>
 			<div class="footer">
-				<h3>Powered by ULX</h3>
+				<h3>由ULX驱动</h3>
 			</div>
 		</div>
 	</body>
@@ -190,7 +190,7 @@ local template_error = [[
 	</head>
 	<body style="background-color: white">
 		<div class="footer">
-			<h3>ULX: MOTD Generator error. Could not parse settings file.</h3>
+			<h3>ULX: MOTD生成器错误: 无法读取设置文件。</h3>
 		</div>
 	</body>
 </html>

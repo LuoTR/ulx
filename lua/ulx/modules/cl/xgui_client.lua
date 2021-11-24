@@ -15,7 +15,7 @@ end
 --Set up various hooks modules can "hook" into.
 function xgui.hookEvent( dtype, event, func, name )
 	if not xgui.hook[dtype] or ( event and not xgui.hook[dtype][event] ) then
-		Msg( "XGUI: Attempted to add to invalid type or event to a hook! (" .. dtype .. ", " .. ( event or "nil" ) .. ")\n" )
+		Msg( "XGUI: 尝试添加一个无效类型或事件到一个钩子上 (" .. dtype .. ", " .. ( event or "nil" ) .. ")\n" )
 	else
 		if not name then name = "FixMe" .. math.floor(math.random()*10000) end -- Backwards compatibility for older XGUI modules
 		if not event then
@@ -86,8 +86,8 @@ if ULib.fileExists( "data/ulx/xgui_settings.txt" ) then
 	xgui.settings = ULib.parseKeyValues( input )
 end
 --Set default settings if they didn't get loaded
-if not xgui.settings.moduleOrder then xgui.settings.moduleOrder = { "Cmds", "Groups", "Maps", "Settings", "Bans" } end
-if not xgui.settings.settingOrder then xgui.settings.settingOrder = { "Sandbox", "Server", "Client" } end
+if not xgui.settings.moduleOrder then xgui.settings.moduleOrder = { "命令", "组", "地图", "设置", "封禁列表" } end
+if not xgui.settings.settingOrder then xgui.settings.settingOrder = { "沙盒", "服务器", "客户端" } end
 if not xgui.settings.animTime then xgui.settings.animTime = 0.22 else xgui.settings.animTime = tonumber( xgui.settings.animTime ) end
 if not xgui.settings.infoColor then
 	--Default color
@@ -97,7 +97,7 @@ else
 	xgui.settings.infoColor = Color(xgui.settings.infoColor.r, xgui.settings.infoColor.g, xgui.settings.infoColor.b, xgui.settings.infoColor.a)
 end
 if not xgui.settings.showLoadMsgs then xgui.settings.showLoadMsgs = true else xgui.settings.showLoadMsgs = ULib.toBool( xgui.settings.showLoadMsgs ) end
-if not xgui.settings.skin then xgui.settings.skin = "Default" end
+if not xgui.settings.skin then xgui.settings.skin = "默认" end
 if not xgui.settings.xguipos then xgui.settings.xguipos = { pos=5, xoff=0, yoff=0 } end
 if not xgui.settings.animIntype then xgui.settings.animIntype = 1 end
 if not xgui.settings.animOuttype then xgui.settings.animOuttype = 1 end
@@ -115,7 +115,7 @@ function xgui.init( ply )
 	xgui.infobar.Paint = function( self, w, h )
 		draw.RoundedBoxEx( 4, 0, 1, 580, 20, xgui.settings.infoColor, false, false, true, true )
 	end
-	local infoLabel = string.format( "\nULX Admin Mod :: XGUI - Team Ulysses |  ULX %s  |  ULib %s", ULib.pluginVersionStr("ULX"), ULib.pluginVersionStr("ULib") )
+	local infoLabel = string.format( "\nULX管理模组 :: XGUI - Ulysses团队 & LuoRain（汉化） |  ULX %s  |  ULib %s", ULib.pluginVersionStr("ULX"), ULib.pluginVersionStr("ULib") )
 	xlib.makelabel{ x=5, y=-10, label=infoLabel, parent=xgui.infobar }:NoClipping( true )
 	xgui.thetime = xlib.makelabel{ x=515, y=-10, label="", parent=xgui.infobar }
 	xgui.thetime:NoClipping( true )
@@ -134,20 +134,20 @@ function xgui.init( ply )
 	local sm = xgui.settings.showLoadMsgs
 	if sm then
 		Msg( "\n///////////////////////////////////////\n" )
-		Msg( "//  ULX GUI -- Made by Stickly Man!  //\n" )
+		Msg( "//     ULX界面 -- Stickly Man制作！   //\n" )
 		Msg( "///////////////////////////////////////\n" )
-		Msg( "// Loading GUI Modules...            //\n" )
+		Msg( "// 加载界面模块...                    //\n" )
 	end
 	for _, file in ipairs( file.Find( "ulx/xgui/*.lua", "LUA" ) ) do
 		include( "ulx/xgui/" .. file )
 		if sm then Msg( "//   " .. file .. string.rep( " ", 32 - file:len() ) .. "//\n" ) end
 	end
-	if sm then Msg( "// Loading Setting Modules...        //\n" ) end
+	if sm then Msg( "// 加载设置模块...                   //\n" ) end
 	for _, file in ipairs( file.Find( "ulx/xgui/settings/*.lua", "LUA" ) ) do
 		include( "ulx/xgui/settings/" .. file )
 		if sm then Msg( "//   " .. file .. string.rep( " ", 32 - file:len() ) .. "//\n" ) end
 	end
-	if sm then Msg( "// Loading Gamemode Module(s)...     //\n" ) end
+	if sm then Msg( "// 加载游戏模式模块...               //\n" ) end
 	if ULib.isSandbox() and GAMEMODE.FolderName ~= "sandbox" then -- If the gamemode sandbox-derived (but not sandbox, that will get added later), then add the sandbox Module
 		include( "ulx/xgui/gamemodes/sandbox.lua" )
 		if sm then Msg( "//   sandbox.lua                     //\n" ) end
@@ -158,9 +158,9 @@ function xgui.init( ply )
 			if sm then Msg( "//   " .. file .. string.rep( " ", 32 - file:len() ) .. "//\n" ) end
 			break
 		end
-		if sm then Msg( "//   No module found!                //\n" ) end
+		if sm then Msg( "//   找不到任何模块                 //\n" ) end
 	end
-	if sm then Msg( "// Modules Loaded!                   //\n" ) end
+	if sm then Msg( "// 模块已加载！                    //\n" ) end
 	if sm then Msg( "///////////////////////////////////////\n\n" ) end
 
 	--Find any existing modules that aren't listed in the requested order.
@@ -195,6 +195,7 @@ function xgui.saveClientSettings()
 		ULib.fileCreateDir( "data/ulx" )
 	end
 	local output = "// This file stores clientside settings for XGUI.\n"
+	output = output .. "// 这个文件存放着XGUI的客户端设置。\n"
 	output = output .. ULib.makeKeyValues( xgui.settings )
 	ULib.fileWrite( "data/ulx/xgui_settings.txt", output )
 end
@@ -302,39 +303,39 @@ function xgui.checkNotInstalled( tabname )
 
 	gui.EnableScreenClicker( true )
 	RestoreCursorPosition()
-	xgui.notInstalledWarning = xlib.makeframe{ label="XGUI Warning!", w=375, h=110, nopopup=true, showclose=false, skin=xgui.settings.skin }
-	xlib.makelabel{ x=10, y=30, wordwrap=true, w=365, label="XGUI has not initialized properly with the server. This could be caused by a heavy server load after a mapchange, a major error during XGUI server startup, or XGUI not being installed.", parent=xgui.notInstalledWarning }
+	xgui.notInstalledWarning = xlib.makeframe{ label="XGUI警告！", w=375, h=110, nopopup=true, showclose=false, skin=xgui.settings.skin }
+	xlib.makelabel{ x=10, y=30, wordwrap=true, w=365, label="XGUI在服务端没有正确地初始化。可能的原因有服务器在地图更换后出现高负载情况、在XGUI服务端初始化时出现了巨大错误或XGUI没有安装。", parent=xgui.notInstalledWarning }
 
-	xlib.makebutton{ x=37, y=83, w=80, label="Offline Mode", parent=xgui.notInstalledWarning }.DoClick = function()
+	xlib.makebutton{ x=37, y=83, w=80, label="离线模式", parent=xgui.notInstalledWarning }.DoClick = function()
 		xgui.notInstalledWarning:Remove()
 		xgui.notInstalledWarning = nil
-		offlineWarning = xlib.makeframe{ label="XGUI Warning!", w=375, h=110, nopopup=true, showclose=false, skin=xgui.settings.skin }
-		xlib.makelabel{ x=10, y=30, wordwrap=true, w=365, label="XGUI will run locally in offline mode. Some features will not work, and information will be missing. You can attempt to reconnect to the server using the 'Refresh Server Data' button in the XGUI client menu.", parent=offlineWarning }
-		xlib.makebutton{ x=77, y=83, w=80, label="OK", parent=offlineWarning }.DoClick = function()
+		offlineWarning = xlib.makeframe{ label="XGUI警告！", w=375, h=110, nopopup=true, showclose=false, skin=xgui.settings.skin }
+		xlib.makelabel{ x=10, y=30, wordwrap=true, w=365, label="XGUI会以离线模式在本地运行。一些功能将无法使用，且一些消息会不完整。你可以使用在XGUI客户端菜单中的“刷新服务器数据”按钮来重新连接服务器。", parent=offlineWarning }
+		xlib.makebutton{ x=77, y=83, w=80, label="好的", parent=offlineWarning }.DoClick = function()
 			offlineWarning:Remove()
 			xgui.offlineMode = true
 			xgui.show( tabname )
 		end
-		xlib.makebutton{ x=217, y=83, w=80, label="Cancel", parent=offlineWarning }.DoClick = function()
+		xlib.makebutton{ x=217, y=83, w=80, label="取消", parent=offlineWarning }.DoClick = function()
 			offlineWarning:Remove()
 			RememberCursorPosition()
 			gui.EnableScreenClicker( false )
 		end
 	end
 
-	xlib.makebutton{ x=257, y=83, w=80, label="Close", parent=xgui.notInstalledWarning }.DoClick = function()
+	xlib.makebutton{ x=257, y=83, w=80, label="关闭", parent=xgui.notInstalledWarning }.DoClick = function()
 		xgui.notInstalledWarning:Remove()
 		xgui.notInstalledWarning = nil
 		RememberCursorPosition()
 		gui.EnableScreenClicker( false )
 	end
 
-	xlib.makebutton{ x=147, y=83, w=80, label="Try Again", parent=xgui.notInstalledWarning }.DoClick = function()
+	xlib.makebutton{ x=147, y=83, w=80, label="再试一次", parent=xgui.notInstalledWarning }.DoClick = function()
 		xgui.notInstalledWarning:Remove()
 		xgui.notInstalledWarning = nil
 		RememberCursorPosition()
 		gui.EnableScreenClicker( false )
-		local reattempt = xlib.makeframe{ label="XGUI: Attempting reconnection...", w=200, h=20, nopopup=true, showclose=false, skin=xgui.settings.skin }
+		local reattempt = xlib.makeframe{ label="XGUI: 尝试重新连接...", w=200, h=20, nopopup=true, showclose=false, skin=xgui.settings.skin }
 		timer.Simple( 1, function()
 			RunConsoleCommand( "_xgui", "getInstalled" )
 			reattempt:Remove()
@@ -354,14 +355,14 @@ function xgui.show( tabname )
 	end
 
 	if not game.SinglePlayer() and not ULib.ucl.authed[LocalPlayer():UniqueID()] then
-		local unauthedWarning = xlib.makeframe{ label="XGUI Error!", w=250, h=90, showclose=true, skin=xgui.settings.skin }
-		xlib.makelabel{ label="Your ULX player has not been Authed!", x=10, y=30, parent=unauthedWarning }
-		xlib.makelabel{ label="Please wait a couple seconds and try again.", x=10, y=45, parent=unauthedWarning }
-		xlib.makebutton{ x=50, y=63, w=60, label="Try Again", parent=unauthedWarning }.DoClick = function()
+		local unauthedWarning = xlib.makeframe{ label="XGUI错误！", w=250, h=90, showclose=true, skin=xgui.settings.skin }
+		xlib.makelabel{ label="你的ULX角色还没有被认证！", x=10, y=30, parent=unauthedWarning }
+		xlib.makelabel{ label="请等几秒后再次尝试。", x=10, y=45, parent=unauthedWarning }
+		xlib.makebutton{ x=50, y=63, w=60, label="再试一次", parent=unauthedWarning }.DoClick = function()
 			unauthedWarning:Remove()
 			xgui.show( tabname )
 		end
-		xlib.makebutton{ x=140, y=63, w=60, label="Close", parent=unauthedWarning }.DoClick = function()
+		xlib.makebutton{ x=140, y=63, w=60, label="关闭", parent=unauthedWarning }.DoClick = function()
 			unauthedWarning:Remove()
 		end
 		return
@@ -380,7 +381,7 @@ function xgui.show( tabname )
 	if tabname and tabname ~= "" then
 		local found, settingsTab
 		for _, v in ipairs( xgui.modules.tab ) do
-			if string.lower( v.name ) == "settings" then settingsTab = v.tabpanel end
+			if string.lower( v.name ) == "settings" then settingsTab = v.tabpanel end -- TODO: Check if this affects
 			if string.lower( v.name ) == string.lower( tabname ) and v.panel:GetParent() ~= xgui.null then
 				xgui.base:SetActiveTab( v.tabpanel )
 				if xgui.anchor:IsVisible() then return end
@@ -439,7 +440,7 @@ function xgui.expectChunks( numofchunks )
 		xgui.chunkbox.max = numofchunks
 		xgui.chunkbox.value = 0
 		xgui.chunkbox:SetFraction( 0 )
-		xgui.chunkbox.Label:SetText( "Getting data: Waiting for server..." )
+		xgui.chunkbox.Label:SetText( "获取数据: 等待服务器..." )
 		xgui.chunkbox:SetVisible( true )
 		xgui.chunkbox:SetSkin( xgui.settings.skin )
 		xgui.flushQueue( "chunkbox" ) --Remove the queue entry that would hide the chunkbox
@@ -508,7 +509,7 @@ end
 function xgui.callUpdate( dtype, event, data )
 	--Run any functions that request to be called when "curtable" is updated
 	if not xgui.hook[dtype] or ( event and not xgui.hook[dtype][event] ) then
-		Msg( "XGUI: Attempted to call non-existent type or event to a hook! (" .. dtype .. ", " .. ( event or "nil" ) .. ")\n" )
+		Msg( "XGUI: 尝试对钩子调用不存在的类型或事件！ (" .. dtype .. ", " .. ( event or "nil" ) .. ")\n" )
 	else
 		if not event then
 			for name, func in pairs( xgui.hook[dtype] ) do func( data ) end
