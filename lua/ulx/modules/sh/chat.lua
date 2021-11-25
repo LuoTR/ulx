@@ -1,33 +1,33 @@
 -- This module holds any type of chatting functions
-CATEGORY_NAME = "Chat"
+CATEGORY_NAME = "聊天"
 
 ------------------------------ Psay ------------------------------
 function ulx.psay( calling_ply, target_ply, message )
 	if calling_ply:GetNWBool( "ulx_muted", false ) then
-		ULib.tsayError( calling_ply, "You are muted, and therefore cannot speak! Use asay for admin chat if urgent.", true )
+		ULib.tsayError( calling_ply, "你已被禁言，所以你不能说话！如果情况紧急可使用asay命令", true )
 		return
 	end
 
-	ulx.fancyLog( { target_ply, calling_ply }, "#P to #P: " .. message, calling_ply, target_ply )
+	ulx.fancyLog( { target_ply, calling_ply }, "#P 给 #P：" .. message, calling_ply, target_ply )
 end
 local psay = ulx.command( CATEGORY_NAME, "ulx psay", ulx.psay, "!p", true )
 psay:addParam{ type=ULib.cmds.PlayerArg, target="!^", ULib.cmds.ignoreCanTarget }
-psay:addParam{ type=ULib.cmds.StringArg, hint="message", ULib.cmds.takeRestOfLine }
+psay:addParam{ type=ULib.cmds.StringArg, hint="消息", ULib.cmds.takeRestOfLine }
 psay:defaultAccess( ULib.ACCESS_ALL )
-psay:help( "Send a private message to target." )
+psay:help( "向目标发送一条私聊消息。" )
 
 ------------------------------ Asay ------------------------------
 local seeasayAccess = "ulx seeasay"
-if SERVER then ULib.ucl.registerAccess( seeasayAccess, ULib.ACCESS_OPERATOR, "Ability to see 'ulx asay'", "Other" ) end -- Give operators access to see asays echoes by default
+if SERVER then ULib.ucl.registerAccess( seeasayAccess, ULib.ACCESS_OPERATOR, "能否看到“ulx asay”", "其它" ) end -- Give operators access to see asays echoes by default
 
 function ulx.asay( calling_ply, message )
 	local format
 	local me = "/me "
 	if message:sub( 1, me:len() ) == me then
-		format = "(ADMINS) *** #P #s"
+		format = "(管理员) *** #P #s"
 		message = message:sub( me:len() + 1 )
 	else
-		format = "#P to admins: #s"
+		format = "#P 给管理员：#s"
 	end
 
 	local players = player.GetAll()
@@ -41,51 +41,51 @@ function ulx.asay( calling_ply, message )
 	ulx.fancyLog( players, format, calling_ply, message )
 end
 local asay = ulx.command( CATEGORY_NAME, "ulx asay", ulx.asay, "@", true, true )
-asay:addParam{ type=ULib.cmds.StringArg, hint="message", ULib.cmds.takeRestOfLine }
+asay:addParam{ type=ULib.cmds.StringArg, hint="消息", ULib.cmds.takeRestOfLine }
 asay:defaultAccess( ULib.ACCESS_ALL )
-asay:help( "Send a message to currently connected admins." )
+asay:help( "发送一条消息给在线管理员。" )
 
 ------------------------------ Tsay ------------------------------
 function ulx.tsay( calling_ply, message )
 	ULib.tsay( _, message )
 
 	if ULib.toBool( GetConVarNumber( "ulx_logChat" ) ) then
-		ulx.logString( string.format( "(tsay from %s) %s", calling_ply:IsValid() and calling_ply:Nick() or "Console", message ) )
+		ulx.logString( string.format( "(来自%s的tsay) %s", calling_ply:IsValid() and calling_ply:Nick() or "控制台", message ) )
 	end
 end
 local tsay = ulx.command( CATEGORY_NAME, "ulx tsay", ulx.tsay, "@@", true, true )
-tsay:addParam{ type=ULib.cmds.StringArg, hint="message", ULib.cmds.takeRestOfLine }
+tsay:addParam{ type=ULib.cmds.StringArg, hint="消息", ULib.cmds.takeRestOfLine }
 tsay:defaultAccess( ULib.ACCESS_ADMIN )
-tsay:help( "Send a message to everyone in the chat box." )
+tsay:help( "给每一个在聊天框的人发送消息。" )
 
 ------------------------------ Csay ------------------------------
 function ulx.csay( calling_ply, message )
 	ULib.csay( _, message )
 
 	if ULib.toBool( GetConVarNumber( "ulx_logChat" ) ) then
-		ulx.logString( string.format( "(csay from %s) %s", calling_ply:IsValid() and calling_ply:Nick() or "Console", message ) )
+		ulx.logString( string.format( "(来自%s的csay) %s", calling_ply:IsValid() and calling_ply:Nick() or "控制台", message ) )
 	end
 end
 local csay = ulx.command( CATEGORY_NAME, "ulx csay", ulx.csay, "@@@", true, true )
-csay:addParam{ type=ULib.cmds.StringArg, hint="message", ULib.cmds.takeRestOfLine }
+csay:addParam{ type=ULib.cmds.StringArg, hint="消息", ULib.cmds.takeRestOfLine }
 csay:defaultAccess( ULib.ACCESS_ADMIN )
-csay:help( "Send a message to everyone in the middle of their screen." )
+csay:help( "给每一个人发送一条显示在屏幕中央的消息。" )
 
 ------------------------------ Thetime ------------------------------
 local waittime = 60
 local lasttimeusage = -waittime
 function ulx.thetime( calling_ply )
 	if lasttimeusage + waittime > CurTime() then
-		ULib.tsayError( calling_ply, "I just told you what time it is! Please wait " .. waittime .. " seconds before using this command again", true )
+		ULib.tsayError( calling_ply, "我刚刚才告诉了你现在是几点！请在" .. waittime .. "秒后再使用此命令", true )
 		return
 	end
 
 	lasttimeusage = CurTime()
-	ulx.fancyLog( "The time is now #s.", os.date( "%I:%M %p") )
+	ulx.fancyLog( "现在的时间是#s。", os.date( "%I:%M %p") )
 end
 local thetime = ulx.command( CATEGORY_NAME, "ulx thetime", ulx.thetime, "!thetime" )
 thetime:defaultAccess( ULib.ACCESS_ALL )
-thetime:help( "Shows you the server time." )
+thetime:help( "告诉你服务器的时间。" )
 
 
 ------------------------------ Adverts ------------------------------
@@ -177,16 +177,16 @@ function ulx.gimp( calling_ply, target_plys, should_ungimp )
 	end
 
 	if not should_ungimp then
-		ulx.fancyLogAdmin( calling_ply, "#A gimped #T", target_plys )
+		ulx.fancyLogAdmin( calling_ply, "#A 使 #T 无法正常说话", target_plys )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A ungimped #T", target_plys )
+		ulx.fancyLogAdmin( calling_ply, "#A 让 #T 正常说话", target_plys )
 	end
 end
 local gimp = ulx.command( CATEGORY_NAME, "ulx gimp", ulx.gimp, "!gimp" )
 gimp:addParam{ type=ULib.cmds.PlayersArg }
 gimp:addParam{ type=ULib.cmds.BoolArg, invisible=true }
 gimp:defaultAccess( ULib.ACCESS_ADMIN )
-gimp:help( "Gimps target(s) so they are unable to chat normally." )
+gimp:help( "给目标戴口球让他们不能正常说话" )
 gimp:setOpposite( "ulx ungimp", {_, _, true}, "!ungimp" )
 
 ------------------------------ Mute ------------------------------
@@ -202,16 +202,16 @@ function ulx.mute( calling_ply, target_plys, should_unmute )
 	end
 
 	if not should_unmute then
-		ulx.fancyLogAdmin( calling_ply, "#A muted #T", target_plys )
+		ulx.fancyLogAdmin( calling_ply, "#A 禁言了 #T", target_plys )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A unmuted #T", target_plys )
+		ulx.fancyLogAdmin( calling_ply, "#A 为 #T 解除了禁言", target_plys )
 	end
 end
 local mute = ulx.command( CATEGORY_NAME, "ulx mute", ulx.mute, "!mute" )
 mute:addParam{ type=ULib.cmds.PlayersArg }
 mute:addParam{ type=ULib.cmds.BoolArg, invisible=true }
 mute:defaultAccess( ULib.ACCESS_ADMIN )
-mute:help( "Mutes target(s) so they are unable to chat." )
+mute:help( "禁言目标让他们无法说话。" )
 mute:setOpposite( "ulx unmute", {_, _, true}, "!unmute" )
 
 if SERVER then
@@ -235,16 +235,16 @@ function ulx.gag( calling_ply, target_plys, should_ungag )
 	end
 
 	if not should_ungag then
-		ulx.fancyLogAdmin( calling_ply, "#A gagged #T", target_plys )
+		ulx.fancyLogAdmin( calling_ply, "#A 给 #T 戴上了口球", target_plys )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A ungagged #T", target_plys )
+		ulx.fancyLogAdmin( calling_ply, "#A 取下了 #T 的口球", target_plys )
 	end
 end
 local gag = ulx.command( CATEGORY_NAME, "ulx gag", ulx.gag, "!gag" )
 gag:addParam{ type=ULib.cmds.PlayersArg }
 gag:addParam{ type=ULib.cmds.BoolArg, invisible=true }
 gag:defaultAccess( ULib.ACCESS_ADMIN )
-gag:help( "Gag target(s), disables microphone." )
+gag:help( "给目标戴上口球，让他们不能语音。" )
 gag:setOpposite( "ulx ungag", {_, _, true}, "!ungag" )
 
 local function gagHook( listener, talker )
@@ -256,7 +256,7 @@ hook.Add( "PlayerCanHearPlayersVoice", "ULXGag", gagHook )
 
 -- Anti-spam stuff
 if SERVER then
-	local chattime_cvar = ulx.convar( "chattime", "1.5", "<time> - Players can only chat every x seconds (anti-spam). 0 to disable.", ULib.ACCESS_ADMIN )
+	local chattime_cvar = ulx.convar( "chattime", "1.5", "<time> - 玩家每次发言必须等待x秒（防刷屏）。使用0来禁用。", ULib.ACCESS_ADMIN )
 	local function playerSay( ply )
 		if not ply.lastChatTime then ply.lastChatTime = 0 end
 
@@ -282,7 +282,7 @@ if SERVER then
 			if not bTeam then
 				ULib.tsay( _, strText )
 			else
-				strText = "(TEAM) " .. strText
+				strText = "(队伍) " .. strText
 				local teamid = ply:Team()
 				local players = team.GetPlayers( teamid )
 				for _, ply2 in ipairs( players ) do
@@ -316,6 +316,6 @@ local function showWelcome( ply )
 end
 hook.Add( "PlayerInitialSpawn", "ULXWelcome", showWelcome )
 if SERVER then
-	ulx.convar( "meChatEnabled", "1", "Allow players to use '/me' in chat. 0 = Disabled, 1 = Sandbox only (Default), 2 = Enabled", ULib.ACCESS_ADMIN )
-	ulx.convar( "welcomemessage", "", "<msg> - This is shown to players on join.", ULib.ACCESS_ADMIN )
+	ulx.convar( "meChatEnabled", "1", "允许玩家在聊天中使用“/me”。0 = 禁用，1 = 仅沙盒（默认），2 = 启用", ULib.ACCESS_ADMIN )
+	ulx.convar( "welcomemessage", "", "<msg> - 此消息在玩家进入服务器时显示", ULib.ACCESS_ADMIN )
 end
