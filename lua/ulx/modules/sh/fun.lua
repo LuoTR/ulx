@@ -1,4 +1,4 @@
-local CATEGORY_NAME = "Fun"
+local CATEGORY_NAME = "趣味"
 
 ------------------------------ Slap ------------------------------
 function ulx.slap( calling_ply, target_plys, dmg )

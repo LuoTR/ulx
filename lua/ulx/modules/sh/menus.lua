@@ -1,4 +1,4 @@
-local CATEGORY_NAME = "Menus"
+local CATEGORY_NAME = "菜单"
 
 if ULib.fileExists( "lua/ulx/modules/cl/motdmenu.lua" ) or ulx.motdmenu_exists then
 	local function sendMotd( ply, showMotd )
@@ -43,17 +43,17 @@ if ULib.fileExists( "lua/ulx/modules/cl/motdmenu.lua" ) or ulx.motdmenu_exists t
 
 	function ulx.motd( calling_ply )
 		if not calling_ply:IsValid() then
-			Msg( "You can't see the motd from the console.\n" )
+			Msg( "你在控制台中不能看到MOTD。\n" )
 			return
 		end
 
 		if GetConVarString( "ulx_showMotd" ) == "0" then
-			ULib.tsay( calling_ply, "The MOTD has been disabled on this server." )
+			ULib.tsay( calling_ply, "MOTD在此服务器上已被禁用。" )
 			return
 		end
 
 		if GetConVarString( "ulx_showMotd" ) == "1" and not ULib.fileExists( GetConVarString( "ulx_motdfile" ) ) then
-			ULib.tsay( calling_ply, "The MOTD file could not be found." )
+			ULib.tsay( calling_ply, "无法找到MOTD文件。" )
 			return
 		end
 
@@ -61,12 +61,12 @@ if ULib.fileExists( "lua/ulx/modules/cl/motdmenu.lua" ) or ulx.motdmenu_exists t
 	end
 	local motdmenu = ulx.command( CATEGORY_NAME, "ulx motd", ulx.motd, "!motd" )
 	motdmenu:defaultAccess( ULib.ACCESS_ALL )
-	motdmenu:help( "Show the message of the day." )
+	motdmenu:help( "显示每日消息。" )
 
 	if SERVER then
-		ulx.convar( "showMotd", "2", " <0/1/2/3> - MOTD mode. 0 is off.", ULib.ACCESS_ADMIN )
-		ulx.convar( "motdfile", "ulx_motd.txt", "MOTD filepath from gmod root to use if ulx showMotd is 1.", ULib.ACCESS_ADMIN )
-		ulx.convar( "motdurl", "ulyssesmod.net", "MOTD URL to use if ulx showMotd is 3.", ULib.ACCESS_ADMIN )
+		ulx.convar( "showMotd", "2", " <0/1/2/3> - MOTD模式。0是关闭。", ULib.ACCESS_ADMIN )
+		ulx.convar( "motdfile", "ulx_motd.txt", "如果showMotd是1，自GMOD根目录开始的MOTD路径", ULib.ACCESS_ADMIN )
+		ulx.convar( "motdurl", "ulyssesmod.net", "如果showMotd是3，MOTD网址", ULib.ACCESS_ADMIN )
 
 		function ulx.populateMotdData()
 			if ulx.motdSettings == nil or ulx.motdSettings.info == nil then return end

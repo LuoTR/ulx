@@ -4,12 +4,12 @@ local CATEGORY_NAME = "Rcon"
 function ulx.rcon( calling_ply, command )
 	ULib.consoleCommand( command .. "\n" )
 
-	ulx.fancyLogAdmin( calling_ply, true, "#A ran rcon command: #s", command )
+	ulx.fancyLogAdmin( calling_ply, true, "#A 运行了rcon命令：#s", command )
 end
 local rcon = ulx.command( CATEGORY_NAME, "ulx rcon", ulx.rcon, "!rcon", true, false, true )
 rcon:addParam{ type=ULib.cmds.StringArg, hint="command", ULib.cmds.takeRestOfLine }
 rcon:defaultAccess( ULib.ACCESS_SUPERADMIN )
-rcon:help( "Execute command on server console." )
+rcon:help( "在服务器控制台运行命令。" )
 
 function ulx.luaRun( calling_ply, command )
 	local return_results = false
@@ -22,7 +22,7 @@ function ulx.luaRun( calling_ply, command )
 
 	if return_results then
 		if type( tmp_var ) == "table" then
-			ULib.console( calling_ply, "Result:" )
+			ULib.console( calling_ply, "结果：" )
 			local lines = ULib.explode( "\n", ulx.dumpTable( tmp_var ) )
 			local chunk_size = 50
 			for i=1, #lines, chunk_size do -- Break it up so we don't overflow the client
@@ -33,48 +33,48 @@ function ulx.luaRun( calling_ply, command )
 				end )
 			end
 		else
-			ULib.console( calling_ply, "Result: " .. tostring( tmp_var ):gsub( "%%", "<p>" ) )
+			ULib.console( calling_ply, "结果：" .. tostring( tmp_var ):gsub( "%%", "<p>" ) )
 		end
 	end
 
-	ulx.fancyLogAdmin( calling_ply, true, "#A ran lua: #s", command )
+	ulx.fancyLogAdmin( calling_ply, true, "#A 运行了Lua：#s", command )
 end
 local luarun = ulx.command( CATEGORY_NAME, "ulx luarun", ulx.luaRun, nil, false, false, true )
-luarun:addParam{ type=ULib.cmds.StringArg, hint="command", ULib.cmds.takeRestOfLine }
+luarun:addParam{ type=ULib.cmds.StringArg, hint="命令", ULib.cmds.takeRestOfLine }
 luarun:defaultAccess( ULib.ACCESS_SUPERADMIN )
-luarun:help( "Executes lua in server console. (Use '=' for output)" )
+luarun:help( "在服务器控制台运行Lua。（用“=”来输出）" )
 
 function ulx.exec( calling_ply, config )
 	if string.sub( config, -4 ) ~= ".cfg" then config = config .. ".cfg" end
 	if not ULib.fileExists( "cfg/" .. config ) then
-		ULib.tsayError( calling_ply, "That config does not exist!", true )
+		ULib.tsayError( calling_ply, "配置文件不存在！", true )
 		return
 	end
 
 	ULib.execFile( "cfg/" .. config )
-	ulx.fancyLogAdmin( calling_ply, "#A executed file #s", config )
+	ulx.fancyLogAdmin( calling_ply, "#A 运行了文件 #s", config )
 end
 local exec = ulx.command( CATEGORY_NAME, "ulx exec", ulx.exec, nil, false, false, true )
-exec:addParam{ type=ULib.cmds.StringArg, hint="file" }
+exec:addParam{ type=ULib.cmds.StringArg, hint="文件" }
 exec:defaultAccess( ULib.ACCESS_SUPERADMIN )
-exec:help( "Execute a file from the cfg directory on the server." )
+exec:help( "运行在服务器cfg目录的文件。" )
 
 function ulx.cexec( calling_ply, target_plys, command )
 	for _, v in ipairs( target_plys ) do
 		v:ConCommand( command )
 	end
 
-	ulx.fancyLogAdmin( calling_ply, "#A ran #s on #T", command, target_plys )
+	ulx.fancyLogAdmin( calling_ply, "#A 在 #T 上运行了命令 #s", target_plys, command )
 end
 local cexec = ulx.command( CATEGORY_NAME, "ulx cexec", ulx.cexec, "!cexec", false, false, true )
 cexec:addParam{ type=ULib.cmds.PlayersArg }
-cexec:addParam{ type=ULib.cmds.StringArg, hint="command", ULib.cmds.takeRestOfLine }
+cexec:addParam{ type=ULib.cmds.StringArg, hint="命令", ULib.cmds.takeRestOfLine }
 cexec:defaultAccess( ULib.ACCESS_SUPERADMIN )
-cexec:help( "Run a command on console of target(s)." )
+cexec:help( "在目标的控制台中执行命令。" )
 
 function ulx.ent( calling_ply, classname, params )
 	if not calling_ply:IsValid() then
-		Msg( "Can't create entities from dedicated server console.\n" )
+		Msg( "无法从专用服务器的控制台中创建实体。\n" )
 		return
 	end
 
@@ -83,7 +83,7 @@ function ulx.ent( calling_ply, classname, params )
 
 	-- Make sure it's a valid ent
 	if not newEnt or not newEnt:IsValid() then
-		ULib.tsayError( calling_ply, "Unknown entity type (" .. classname .. "), aborting.", true )
+		ULib.tsayError( calling_ply, "未知实体类型 (" .. classname .. ")，中止...", true )
 		return
 	end
 
@@ -108,13 +108,13 @@ function ulx.ent( calling_ply, classname, params )
 	undo.Finish()
 
 	if not params or params == "" then
-		ulx.fancyLogAdmin( calling_ply, "#A created ent #s", classname )
+		ulx.fancyLogAdmin( calling_ply, "#A 创建了实体 #s", classname )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A created ent #s with params #s", classname, params )
+		ulx.fancyLogAdmin( calling_ply, "#A 以 #s 为参数创建了实体 #s", params, classname )
 	end
 end
 local ent = ulx.command( CATEGORY_NAME, "ulx ent", ulx.ent, nil, false, false, true )
-ent:addParam{ type=ULib.cmds.StringArg, hint="classname" }
-ent:addParam{ type=ULib.cmds.StringArg, hint="<flag> : <value> |", ULib.cmds.takeRestOfLine, ULib.cmds.optional }
+ent:addParam{ type=ULib.cmds.StringArg, hint="类名" }
+ent:addParam{ type=ULib.cmds.StringArg, hint="<标识> : <值> |", ULib.cmds.takeRestOfLine, ULib.cmds.optional }
 ent:defaultAccess( ULib.ACCESS_SUPERADMIN )
-ent:help( "Spawn an ent, separate flag and value with ':', flag:value pairs with '|'." )
+ent:help( "生成一个实体，用“:”分隔标识与值、“|”分隔各个标识" )

@@ -1,4 +1,4 @@
-CATEGORY_NAME = "Teleport"
+CATEGORY_NAME = "传送"
 
 local function spiralGrid(rings)
 	local grid = {}
@@ -76,7 +76,7 @@ function ulx.bring( calling_ply, target_plys )
 	local cell_size = 50 -- Constance spacing value
 
   if not calling_ply:IsValid() then
-    Msg( "If you brought someone to you, they would instantly be destroyed by the awesomeness that is console.\n" )
+    Msg( "如果你将某个人带到你这边来，他们会瞬间被奇妙的控制台之力摧毁。\n" )
     return
   end
 
@@ -86,12 +86,12 @@ function ulx.bring( calling_ply, target_plys )
   end
 
   if not calling_ply:Alive() then
-    ULib.tsayError( calling_ply, "You are dead!", true )
+    ULib.tsayError( calling_ply, "你已经死了！", true )
     return
   end
 
   if calling_ply:InVehicle() then
-    ULib.tsayError( calling_ply, "Please leave the vehicle first!", true )
+    ULib.tsayError( calling_ply, "请先离开载具！", true )
     return
   end
 
@@ -103,7 +103,7 @@ function ulx.bring( calling_ply, target_plys )
 	local tr = util.TraceEntity( t, calling_ply )
 
   if tr.Hit then
-    ULib.tsayError( calling_ply, "Can't teleport when you're inside the world!", true )
+    ULib.tsayError( calling_ply, "无法传送，因为你在世界当中！", true )
     return
   end
 
@@ -114,7 +114,7 @@ function ulx.bring( calling_ply, target_plys )
     if ulx.getExclusive( v, calling_ply ) then
       ULib.tsayError( calling_ply, ulx.getExclusive( v, calling_ply ), true )
     elseif not v:Alive() then
-      ULib.tsayError( calling_ply, v:Nick() .. " is dead!", true )
+      ULib.tsayError( calling_ply, v:Nick() .. " 已经死了！", true )
     else
       table.insert( teleportable_plys, v )
     end
@@ -154,21 +154,21 @@ function ulx.bring( calling_ply, target_plys )
   end
 
   if #teleportable_plys > 0 then
-    ULib.tsayError( calling_ply, "Not enough free space to bring everyone!", true )
+    ULib.tsayError( calling_ply, "没有足够的空间来容纳所有人！", true )
   end
 
 	if #affected_plys > 0 then
-  	ulx.fancyLogAdmin( calling_ply, "#A brought #T", affected_plys )
+  	ulx.fancyLogAdmin( calling_ply, "#A 带来了 #T", affected_plys )
 	end
 end
 local bring = ulx.command( CATEGORY_NAME, "ulx bring", ulx.bring, "!bring" )
 bring:addParam{ type=ULib.cmds.PlayersArg, target="!^" }
 bring:defaultAccess( ULib.ACCESS_ADMIN )
-bring:help( "Brings target(s) to you." )
+bring:help( "将目标带到你这来。" )
 
 function ulx.goto( calling_ply, target_ply )
 	if not calling_ply:IsValid() then
-		Msg( "You may not step down into the mortal world from console.\n" )
+		Msg( "你可能不会想离开控制台的魔幻世界。\n" )
 		return
 	end
 
@@ -178,23 +178,23 @@ function ulx.goto( calling_ply, target_ply )
 	end
 
 	if not target_ply:Alive() then
-		ULib.tsayError( calling_ply, target_ply:Nick() .. " is dead!", true )
+		ULib.tsayError( calling_ply, target_ply:Nick() .. " 已经死了！", true )
 		return
 	end
 
 	if not calling_ply:Alive() then
-		ULib.tsayError( calling_ply, "You are dead!", true )
+		ULib.tsayError( calling_ply, "你已经死了！", true )
 		return
 	end
 
 	if target_ply:InVehicle() and calling_ply:GetMoveType() ~= MOVETYPE_NOCLIP then
-		ULib.tsayError( calling_ply, "Target is in a vehicle! Noclip and use this command to force a goto.", true )
+		ULib.tsayError( calling_ply, "目标在载具当中！启用穿墙飞行后再使用此命令来进行强制传送。", true )
 		return
 	end
 
 	local newpos = playerSend( calling_ply, target_ply, calling_ply:GetMoveType() == MOVETYPE_NOCLIP )
 	if not newpos then
-		ULib.tsayError( calling_ply, "Can't find a place to put you! Noclip and use this command to force a goto.", true )
+		ULib.tsayError( calling_ply, "找不到地方来放你！启用穿墙飞行后再使用此命令来进行强制传送。", true )
 		return
 	end
 
@@ -208,16 +208,16 @@ function ulx.goto( calling_ply, target_ply )
 	calling_ply:SetEyeAngles( newang )
 	calling_ply:SetLocalVelocity( Vector( 0, 0, 0 ) ) -- Stop!
 
-	ulx.fancyLogAdmin( calling_ply, "#A teleported to #T", target_ply )
+	ulx.fancyLogAdmin( calling_ply, "#A 传送到了 #T", target_ply )
 end
 local goto = ulx.command( CATEGORY_NAME, "ulx goto", ulx.goto, "!goto" )
 goto:addParam{ type=ULib.cmds.PlayerArg, target="!^", ULib.cmds.ignoreCanTarget }
 goto:defaultAccess( ULib.ACCESS_ADMIN )
-goto:help( "Goto target." )
+goto:help( "前往目标。" )
 
 function ulx.send( calling_ply, target_from, target_to )
 	if target_from == target_to then
-		ULib.tsayError( calling_ply, "You listed the same target twice! Please use two different targets.", true )
+		ULib.tsayError( calling_ply, "你两次都使用了同一个目标！请使用不同的目标。", true )
 		return
 	end
 
@@ -237,18 +237,18 @@ function ulx.send( calling_ply, target_from, target_to )
 		if not target_to:Alive() then
 			nick = target_to:Nick()
 		end
-		ULib.tsayError( calling_ply, nick .. " is dead!", true )
+		ULib.tsayError( calling_ply, nick .. " 已经死了！", true )
 		return
 	end
 
 	if target_to:InVehicle() and target_from:GetMoveType() ~= MOVETYPE_NOCLIP then
-		ULib.tsayError( calling_ply, "Target is in a vehicle!", true )
+		ULib.tsayError( calling_ply, "目标在载具当中！", true )
 		return
 	end
 
 	local newpos = playerSend( target_from, target_to, target_from:GetMoveType() == MOVETYPE_NOCLIP )
 	if not newpos then
-		ULib.tsayError( calling_ply, "Can't find a place to put them!", true )
+		ULib.tsayError( calling_ply, "找不到地方来放置他们！", true )
 		return
 	end
 
@@ -262,17 +262,17 @@ function ulx.send( calling_ply, target_from, target_to )
 	target_from:SetEyeAngles( newang )
 	target_from:SetLocalVelocity( Vector( 0, 0, 0 ) ) -- Stop!
 
-	ulx.fancyLogAdmin( calling_ply, "#A transported #T to #T", target_from, target_to )
+	ulx.fancyLogAdmin( calling_ply, "#A 将 #T 传送到了 #T", target_from, target_to )
 end
 local send = ulx.command( CATEGORY_NAME, "ulx send", ulx.send, "!send" )
 send:addParam{ type=ULib.cmds.PlayerArg, target="!^" }
 send:addParam{ type=ULib.cmds.PlayerArg, target="!^" }
 send:defaultAccess( ULib.ACCESS_ADMIN )
-send:help( "Goto target." )
+send:help( "前往目标。" )
 
 function ulx.teleport( calling_ply, target_ply )
 	if not calling_ply:IsValid() then
-		Msg( "You are the console, you can't teleport or teleport others since you can't see the world!\n" )
+		Msg( "你是控制台，由于你看不到世界，所以你无法传送或传送他人！\n" )
 		return
 	end
 
@@ -282,7 +282,7 @@ function ulx.teleport( calling_ply, target_ply )
 	end
 
 	if not target_ply:Alive() then
-		ULib.tsayError( calling_ply, target_ply:Nick() .. " is dead!", true )
+		ULib.tsayError( calling_ply, target_ply:Nick() .. " 已经死了！", true )
 		return
 	end
 
@@ -312,22 +312,22 @@ function ulx.teleport( calling_ply, target_ply )
 	target_ply:SetLocalVelocity( Vector( 0, 0, 0 ) ) -- Stop!
 
 	if target_ply ~= calling_ply then
-		ulx.fancyLogAdmin( calling_ply, "#A teleported #T", target_ply ) -- We don't want to log otherwise
+		ulx.fancyLogAdmin( calling_ply, "#A 传送了 #T", target_ply ) -- We don't want to log otherwise
 	end
 end
 local teleport = ulx.command( CATEGORY_NAME, "ulx teleport", ulx.teleport, {"!tp", "!teleport"} )
 teleport:addParam{ type=ULib.cmds.PlayerArg, ULib.cmds.optional }
 teleport:defaultAccess( ULib.ACCESS_ADMIN )
-teleport:help( "Teleports target." )
+teleport:help( "传送目标。" )
 
 function ulx.retrn( calling_ply, target_ply )
 	if not target_ply:IsValid() then
-		Msg( "Return where? The console may never return to the mortal realm.\n" )
+		Msg( "回到哪里？控制台可能永远都回不去那极乐净土。\n" )
 		return
 	end
 
 	if not target_ply.ulx_prevpos then
-		ULib.tsayError( calling_ply, target_ply:Nick() .. " does not have any previous locations to send them to.", true )
+		ULib.tsayError( calling_ply, target_ply:Nick() .. " 没有能够传送回去的位置。", true )
 		return
 	end
 
@@ -337,7 +337,7 @@ function ulx.retrn( calling_ply, target_ply )
 	end
 
 	if not target_ply:Alive() then
-		ULib.tsayError( calling_ply, target_ply:Nick() .. " is dead!", true )
+		ULib.tsayError( calling_ply, target_ply:Nick() .. " 已经死了！", true )
 		return
 	end
 
@@ -351,9 +351,9 @@ function ulx.retrn( calling_ply, target_ply )
 	target_ply.ulx_prevang = nil
 	target_ply:SetLocalVelocity( Vector( 0, 0, 0 ) ) -- Stop!
 
-	ulx.fancyLogAdmin( calling_ply, "#A returned #T to their original position", target_ply )
+	ulx.fancyLogAdmin( calling_ply, "#A 将 #T 送回了他们的原位置", target_ply )
 end
 local retrn = ulx.command( CATEGORY_NAME, "ulx return", ulx.retrn, "!return" )
 retrn:addParam{ type=ULib.cmds.PlayerArg, ULib.cmds.optional }
 retrn:defaultAccess( ULib.ACCESS_ADMIN )
-retrn:help( "Returns target to last position before a teleport." )
+retrn:help( "将目标送回传送前的位置。" )
