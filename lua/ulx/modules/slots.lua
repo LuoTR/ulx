@@ -1,9 +1,9 @@
-ulx.convar( "rslotsMode", "0", " - Sets the slots mode. See config for more information.", ULib.ACCESS_ADMIN )
-ulx.convar( "rslots", "2", " - Sets the number of reserved slots, only applicable for modes 1 and 2.", ULib.ACCESS_ADMIN )
-ulx.convar( "rslotsVisible", "1", " - Sets whether slots are visible. See config for more information.", ULib.ACCESS_ADMIN )
+ulx.convar( "rslotsMode", "0", " - 设置预留位置模式。查看配置获取更多信息。", ULib.ACCESS_ADMIN )
+ulx.convar( "rslots", "2", " - 设置预留位置的数量，只对模式1和2生效。", ULib.ACCESS_ADMIN )
+ulx.convar( "rslotsVisible", "1", " - 设置预留位置是否可见。查看配置获取更多信息。", ULib.ACCESS_ADMIN )
 
 local access = "ulx reservedslots" -- Access string needed for reserved slots
-ULib.ucl.registerAccess( access, ULib.ACCESS_ADMIN, "Access to reserved slots", "Other" ) -- Give admins access to reserved slots by default
+ULib.ucl.registerAccess( access, ULib.ACCESS_ADMIN, "使用预留位置的权限", "其它" ) -- Give admins access to reserved slots by default
 
 function calcSlots( disconnect )
 	local mode = GetConVarNumber( "ulx_rslotsMode" )
@@ -76,14 +76,14 @@ local function playerAccess( ply )
 				return
 			end
 
-			ULib.kick( shortestply, "[ULX] Freeing slot. Sorry, you had the shortest connection time." )
+			ULib.kick( shortestply, "[ULX]正在释放预留位置。抱歉，你的连接时间最短。" )
 		end
 
 		return
 	end
 
 	if cur + slots > max then
-		ULib.queueFunctionCall( ULib.kick, ply, "[ULX] Reserved slot, sorry!" ) -- Wait a frame so all access hooks can be called properly.
+		ULib.queueFunctionCall( ULib.kick, ply, "[ULX]预留位置，抱歉！" ) -- Wait a frame so all access hooks can be called properly.
 	end
 end
 hook.Add( ULib.HOOK_UCLAUTH, "ULXReservedSlots", playerAccess, HOOK_MONITOR_LOW ) -- Run at the end of auth

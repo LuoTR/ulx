@@ -3,8 +3,8 @@
 
 local settings = {}
 function settings.init()
-	ULib.ucl.registerAccess( "xgui_gmsettings", "superadmin", "Allows changing of gamemode-specific settings on the settings tab in XGUI.", "XGUI" )
-	ULib.ucl.registerAccess( "xgui_svsettings", "superadmin", "Allows changing of server and ULX-specific settings on the settings tab in XGUI.", "XGUI" )
+	ULib.ucl.registerAccess( "xgui_gmsettings", "superadmin", "允许在XGUI中的设置标签页修改游戏模式设置。", "XGUI" )
+	ULib.ucl.registerAccess( "xgui_svsettings", "superadmin", "允许在XGUI中的设置标签页修改服务器和ULX设置。", "XGUI" )
 
 	xgui.addDataType( "gimps", function() return ulx.gimpSays end, "xgui_svsettings", 0, -10 )
 	xgui.addDataType( "adverts", function() return ulx.adverts end, "xgui_svsettings", 0, -10 )
@@ -267,7 +267,7 @@ function settings.init()
 				new_file = new_file .. map .. "\n"
 			end
 		else
-			Msg( "XGUI: Could not save votemaps- Invalid or nonexistent ulx_votemapMapmode cvar!\n" )
+			Msg( "XGUI：无法保存可投票地图- ulx_votemapMapmode控制台变量无效或不存在！\n" )
 			return
 		end
 
@@ -281,9 +281,9 @@ function settings.init()
 		if ULib.ucl.query( ply, "xgui_svsettings" ) then
 			-- Create fake ban info for testing
 			local banData = {
-				admin   = "Mr. Admin Man (STEAM_1:1:1111111)",
-				name    = "Bob Troll",
-				reason  = "Disobeying the rules",
+				admin   = "管理员先生 (STEAM_1:1:1111111)",
+				name    = "挑衅的鲍勃",
+				reason  = "不遵守规则",
 				steamID = "STEAM_1:1:1111111",
 				time    = os.time(),
 				unban   = os.time() + 1654654

@@ -4,15 +4,15 @@
 local server = xlib.makepanel{ parent=xgui.null }
 
 --------------------------GMOD Settings--------------------------
-xlib.makecheckbox{ x=10, y=10, label="Enable Voice Chat", repconvar="rep_sv_voiceenable", parent=server }
-xlib.makelabel{ x=10, y=33, label="Alltalk setting:", parent=server }
-xlib.makecombobox{ x=10, y=50, w=120, repconvar="rep_sv_alltalk", isNumberConvar=true, choices={ "Team near you", "Team only", "Everyone near you", "Everyone" }, parent=server }
-xlib.makecheckbox{ x=10, y=75, label="Disable AI", repconvar="rep_ai_disabled", parent=server }
-xlib.makecheckbox{ x=10, y=95, label="AI Ignore Players", repconvar="rep_ai_ignoreplayers", parent=server }
+xlib.makecheckbox{ x=10, y=10, label="启用语音聊天", repconvar="rep_sv_voiceenable", parent=server }
+xlib.makelabel{ x=10, y=33, label="全体语音设置：", parent=server }
+xlib.makecombobox{ x=10, y=50, w=120, repconvar="rep_sv_alltalk", isNumberConvar=true, choices={ "靠近你的队伍", "仅队伍", "靠近你的所有人", "所有人" }, parent=server }
+xlib.makecheckbox{ x=10, y=75, label="禁用AI", repconvar="rep_ai_disabled", parent=server }
+xlib.makecheckbox{ x=10, y=95, label="AI忽略玩家", repconvar="rep_ai_ignoreplayers", parent=server }
 local offset = 0
 if game.SinglePlayer() then
 	offset = 20
-	xlib.makecheckbox{ x=10, y=115, label="Keep AI Ragdolls", repconvar="rep_ai_keepragdolls", parent=server }
+	xlib.makecheckbox{ x=10, y=115, label="保留AI玩偶", repconvar="rep_ai_keepragdolls", parent=server }
 end
 xlib.makelabel{ x=10, y=120+offset, label="sv_gravity", parent=server }
 xlib.makeslider{ x=10, y=135+offset, label="<--->", w=125, min=-1000, max=1000, repconvar="rep_sv_gravity", parent=server }
@@ -24,7 +24,7 @@ server.mask = xlib.makepanel{ x=295, y=5, w=290, h=322, parent=server }
 server.panel = xlib.makepanel{ x=5, w=285, h=322, parent=server.mask }
 
 server.catList = xlib.makelistview{ x=145, y=5, w=150, h=322, parent=server }
-server.catList:AddColumn( "Server Setting Modules" )
+server.catList:AddColumn( "服务器设置模块" )
 server.catList.Columns[1].DoClick = function() end
 server.catList.OnRowSelected = function( self, LineID, Line )
 	local nPanel = xgui.modules.submodule[Line:GetValue(2)].panel
@@ -98,7 +98,7 @@ end
 server.processModules()
 
 xgui.hookEvent( "onProcessModules", nil, server.processModules, "serverSettingsProcessModules" )
-xgui.addSettingModule( "Server", server, "icon16/server.png", "xgui_svsettings" )
+xgui.addSettingModule( "服务器", server, "icon16/server.png", "xgui_svsettings" )
 
 
 ---------------------------
@@ -108,12 +108,12 @@ xgui.addSettingModule( "Server", server, "icon16/server.png", "xgui_svsettings" 
 
 -------------------------Admin Votemaps--------------------------
 local plist = xlib.makelistlayout{ w=275, h=322, parent=xgui.null }
-plist:Add( xlib.makelabel{ label="Admin Votemap Settings" } )
-plist:Add( xlib.makelabel{ label="Ratio of votes needed to accept a mapchange" } )
+plist:Add( xlib.makelabel{ label="管理员投票换图设置" } )
+plist:Add( xlib.makelabel{ label="接受一次换图需要的投票比例" } )
 plist:Add( xlib.makeslider{ label="<--->", min=0, max=1, decimal=2, repconvar="ulx_votemap2Successratio" } )
-plist:Add( xlib.makelabel{ label="Minimum votes for a successful mapchange" } )
+plist:Add( xlib.makelabel{ label="成功换图的最低投票量" } )
 plist:Add( xlib.makeslider{ label="<--->", min=0, max=10, repconvar="ulx_votemap2Minvotes" } )
-xgui.addSubModule( "ULX Admin Votemaps", plist, nil, "server" )
+xgui.addSubModule( "ULX管理员投票换图", plist, nil, "server" )
 
 -----------------------------Adverts-----------------------------
 xgui.prepareDataType( "adverts" )
@@ -124,7 +124,7 @@ adverts.tree.DoClick = function( self, node )
 	adverts.updatebutton:SetDisabled( not node.data )
 	adverts.nodeup:SetDisabled( not node.data or type( node.group ) == "number" )
 	adverts.nodedown:SetDisabled( not node.data or not type( node.group ) == "number" or adverts.isBottomNode( node ) )
-	adverts.group:SetText( type(node.group) ~= "number" and node.group or "<No Group>" )
+	adverts.group:SetText( type(node.group) ~= "number" and node.group or "<未分组>" )
 	if node.data then
 		adverts.message:SetText( node.data.message )
 		adverts.time:SetValue( node.data.rpt )
@@ -159,36 +159,36 @@ adverts.tree.DoRightClick = function( self, node )
 	local menu = DermaMenu()
 	menu:SetSkin(xgui.settings.skin)
 	if not node.data then
-		menu:AddOption( "Rename Group...", function() adverts.RenameAdvert( node:GetText() ) end )
+		menu:AddOption( "重命名组...", function() adverts.RenameAdvert( node:GetText() ) end )
 	end
-	menu:AddOption( "Delete", function() adverts.removeAdvert( node ) end )
+	menu:AddOption( "删除", function() adverts.removeAdvert( node ) end )
 	menu:Open()
 end
 adverts.seloffset = 0
-adverts.message = xlib.maketextbox{ x=125, w=150, h=20, text="Enter a message...", parent=adverts, selectall=true }
-xlib.makelabel{ x=125, y=25, label="Time until advert repeats:", parent=adverts }
-adverts.time = xlib.makeslider{ x=125, y=40, w=150, label="<--->", value=60, min=1, max=1000, tooltip="Time in seconds till the advert is shown/repeated.", parent=adverts }
-adverts.group = xlib.makecombobox{ x=125, y=65, w=150, enableinput=true, parent=adverts, tooltip="Select or create a new advert group." }
+adverts.message = xlib.maketextbox{ x=125, w=150, h=20, text="输入信息...", parent=adverts, selectall=true }
+xlib.makelabel{ x=125, y=25, label="广播重复时间：", parent=adverts }
+adverts.time = xlib.makeslider{ x=125, y=40, w=150, label="<--->", value=60, min=1, max=1000, tooltip="秒为单位的广播间隔时间", parent=adverts }
+adverts.group = xlib.makecombobox{ x=125, y=65, w=150, enableinput=true, parent=adverts, tooltip="选择或创建新的广播组" }
 adverts.color = xlib.makecolorpicker{ x=135, y=90, parent=adverts }
 local panel = xlib.makelistlayout{ w=150, h=45, spacing=4, parent=xgui.null }
-panel:Add( xlib.makelabel{ label="Display Time (seconds)" } )
-adverts.display = xlib.makeslider{ label="<--->", min=1, max=60, value=10, tooltip="The time in seconds the CSay advert is displayed" }
+panel:Add( xlib.makelabel{ label="显示时间（秒）" } )
+adverts.display = xlib.makeslider{ label="<--->", min=1, max=60, value=10, tooltip="以秒为单位的CSay广播显示时间" }
 panel:Add( adverts.display )
-adverts.csay = xlib.makecat{ x=125, y=230, w=150, label="Display in center", checkbox=true, contents=panel, parent=adverts, expanded=false }
-xlib.makebutton{ x=200, y=302, w=75, label="Create", parent=adverts }.DoClick = function()
+adverts.csay = xlib.makecat{ x=125, y=230, w=150, label="于中间显示", checkbox=true, contents=panel, parent=adverts, expanded=false }
+xlib.makebutton{ x=200, y=302, w=75, label="创建", parent=adverts }.DoClick = function()
 	local col = adverts.color:GetColor()
 	local rpt = tonumber( adverts.time:GetValue() )
 	RunConsoleCommand( "xgui", "addAdvert", adverts.message:GetValue(), ( rpt < 0.1 ) and 0.1 or rpt, adverts.group:GetValue(), col.r, col.g, col.b, adverts.csay:GetExpanded() and adverts.display:GetValue() or nil)
 end
-adverts.removebutton = xlib.makebutton{ y=302, w=75, label="Remove", disabled=true, parent=adverts }
+adverts.removebutton = xlib.makebutton{ y=302, w=75, label="移除", disabled=true, parent=adverts }
 adverts.removebutton.DoClick = function( node )
 	adverts.removeAdvert( adverts.tree:GetSelectedItem() )
 end
-adverts.updatebutton = xlib.makebutton{ x=125, y=302, w=75, label="Update", parent=adverts, disabled=true }
+adverts.updatebutton = xlib.makebutton{ x=125, y=302, w=75, label="更新", parent=adverts, disabled=true }
 adverts.updatebutton.DoClick = function( node )
 	local node = adverts.tree:GetSelectedItem()
 	local col = adverts.color:GetColor()
-	if ((( type( node.group ) == "number" ) and "<No Group>" or node.group ) == adverts.group:GetValue() ) then
+	if ((( type( node.group ) == "number" ) and "<未分组>" or node.group ) == adverts.group:GetValue() ) then
 		RunConsoleCommand( "xgui", "updateAdvert", type( node.group ), node.group, node.number, adverts.message:GetValue(), ( adverts.time:GetValue() < 0.1 ) and 0.1 or adverts.time:GetValue(), col.r, col.g, col.b, adverts.csay:GetExpanded() and adverts.display:GetValue() or nil )
 	else
 		RunConsoleCommand( "xgui", "removeAdvert", node.group, node.number, type( node.group ), "hold" )
@@ -213,7 +213,7 @@ adverts.nodeup.DoClick = function()
 	else
 		local parentnode = node:GetParentNode()
 		local parentparentchildren = parentnode:GetParentNode().ChildNodes:GetChildren()
-		local newgroup = "<No Group>"
+		local newgroup = "<未分组>"
 		for i,v in ipairs( parentparentchildren ) do
 			if v == parentnode then
 				if parentparentchildren[i-1] and type( parentparentchildren[i-1].group ) ~= "number" then
@@ -226,7 +226,7 @@ adverts.nodeup.DoClick = function()
 		end
 		RunConsoleCommand( "xgui", "removeAdvert", node.group, node.number, type( node.group ), "hold" )
 		RunConsoleCommand( "xgui", "addAdvert", node.data.message, node.data.rpt, newgroup, node.data.color.r, node.data.color.g, node.data.color.b, node.data.len)
-		if newgroup == "<No Group>" then
+		if newgroup == "<未分组>" then
 			adverts.selnewgroup = #xgui.data.adverts+1
 			adverts.seloffset = 1
 		end
@@ -241,7 +241,7 @@ adverts.nodedown.DoClick = function()
 	if state == 1 or state == 3 then
 		local parentnode = type( node.group ) == "string" and node:GetParentNode() or node
 		local parentchildren = parentnode:GetParentNode().ChildNodes:GetChildren()
-		local newgroup = "<No Group>"
+		local newgroup = "<未分组>"
 		for index,v in ipairs( parentchildren ) do
 			if v == parentnode then
 				local temp = 1
@@ -266,7 +266,7 @@ adverts.nodedown.DoClick = function()
 end
 function adverts.removeAdvert( node )
 	if node then
-		Derma_Query( "Are you sure you want to delete this " .. ( node.data and "advert?" or "advert group?" ), "XGUI WARNING",
+		Derma_Query( "你确定要删除这个" .. ( node.data and "广播吗？" or "广播组吗？" ), "XGUI WARNING",
 		"Delete", function()
 			if node.data then --Remove a single advert
 				RunConsoleCommand( "xgui", "removeAdvert", node.group, node.number, type( node.group ) )
@@ -278,13 +278,13 @@ function adverts.removeAdvert( node )
 	end
 end
 function adverts.RenameAdvert( old )
-	advertRename = xlib.makeframe{ label="Set Name of Advert Group - " .. old, w=400, h=80, showclose=true, skin=xgui.settings.skin }
+	advertRename = xlib.makeframe{ label="设置广播组的名字 - " .. old, w=400, h=80, showclose=true, skin=xgui.settings.skin }
 	advertRename.text = xlib.maketextbox{ x=10, y=30, w=380, h=20, text=old, parent=advertRename }
 	advertRename.text.OnEnter = function( self )
 		RunConsoleCommand( "xgui", "renameAdvertGroup", old, self:GetValue() )
 		advertRename:Remove()
 	end
-	xlib.makebutton{ x=175, y=55, w=50, label="OK", parent=advertRename }.DoClick = function()
+	xlib.makebutton{ x=175, y=55, w=50, label="好的", parent=advertRename }.DoClick = function()
 		advertRename.text:OnEnter()
 	end
 end
@@ -313,7 +313,7 @@ function adverts.updateAdverts()
 	adverts.hasGroups = false
 	adverts.tree:Clear()
 	adverts.group:Clear()
-	adverts.group:AddChoice( "<No Group>" )
+	adverts.group:AddChoice( "<未分组>" )
 	adverts.group:ChooseOptionID( 1 )
 
 	local sortGroups = {}
@@ -370,12 +370,12 @@ function adverts.createNode( parent, data, group, number, message, lastNode )
 	node.data = data
 	node.group = group
 	node.number = number
-	node:SetTooltip( xlib.wordWrap( message, 250, "Default" ) )
+	node:SetTooltip( xlib.wordWrap( message, 250, "默认" ) )
 	if lastNode and lastNode.data then
 		--Check if node was previously selected
 		if lastNode.group == group and lastNode.number == number then
 			adverts.tree:SetSelectedItem( node )
-			adverts.group:SetText( type(node.group) ~= "number" and node.group or "<No Group>" )
+			adverts.group:SetText( type(node.group) ~= "number" and node.group or "<未分组>" )
 			adverts.updatebutton:SetDisabled( false )
 			adverts.nodeup:SetDisabled( false )
 			adverts.nodedown:SetDisabled( false )
@@ -393,14 +393,14 @@ xgui.addSubModule( "ULX Adverts", adverts, nil, "server" )
 ---------------------------Ban Message---------------------------
 xgui.prepareDataType( "banmessage" )
 local plist = xlib.makelistlayout{ w=275, h=322, parent=xgui.null }
-plist:Add( xlib.makelabel{ label="Message Shown to Banned Users", zpos=1 } )
+plist:Add( xlib.makelabel{ label="给被封禁的玩家显示的信息", zpos=1 } )
 plist.txtBanMessage = xlib.maketextbox{ zpos=2, h=236, multiline=true }
 plist:Add( plist.txtBanMessage )
-plist:Add( xlib.makelabel{ label="Insert variable:", zpos=3 } )
-plist.variablePicker = xlib.makecombobox{ choices={ "Banned By - Admin:SteamID who created the ban", "Ban Start - Date/Time the ban was created", "Reason", "Time Left", "SteamID (excluding non-number characters)", "SteamID64 (useful for constructing URLs for appealing bans)" }, zpos=4 }
+plist:Add( xlib.makelabel{ label="插入变量：", zpos=3 } )
+plist.variablePicker = xlib.makecombobox{ choices={ "封禁者 - 创建封禁的管理员SteamID", "开始封禁 - 封禁被创建的日期/时间", "原因", "剩余时间", "SteamID（除去非数字字符）", "SteamID64（对创建用于申诉的URL十分有用）" }, zpos=4 }
 plist:Add( plist.variablePicker )
 
-plist.btnPreview = xlib.makebutton{ label="Preview Ban Message", zpos=4 }
+plist.btnPreview = xlib.makebutton{ label="预览封禁信息", zpos=4 }
 plist.btnPreview.DoClick = function()
 	net.Start( "XGUI.PreviewBanMessage" )
 		net.WriteString( plist.txtBanMessage:GetText() )
@@ -410,14 +410,14 @@ xgui.handleBanPreview = function( message )
 	local preview = xlib.makeframe{ w=380, h=200 }
 	local message = xlib.makelabel{ x=20, y=35, label=message, textcolor=Color( 191, 191, 191, 255 ), font="DefaultLarge", parent=preview }
 	message:SizeToContents()
-	local close = xlib.makebutton{ x=288, y=message:GetTall()+42, w=72, h=24, label="Close", font="DefaultLarge", parent=preview }
+	local close = xlib.makebutton{ x=288, y=message:GetTall()+42, w=72, h=24, label="关闭", font="DefaultLarge", parent=preview }
 	close.DoClick = function()
 		preview:Remove()
 	end
 	preview:SetTall( message:GetTall() + 85 )
 end
 plist:Add( plist.btnPreview )
-plist.btnSave = xlib.makebutton{ label="Save Ban Message", zpos=5 }
+plist.btnSave = xlib.makebutton{ label="保存封禁信息", zpos=5 }
 plist.btnSave.DoClick = function()
 	net.Start( "XGUI.SaveBanMessage" )
 		net.WriteString( plist.txtBanMessage:GetText() )
@@ -450,30 +450,30 @@ end
 plist.updateBanMessage()
 xgui.hookEvent( "banmessage", "process", plist.updateBanMessage, "serverUpdateBanMessage" )
 
-xgui.addSubModule( "ULX Ban Message", plist, nil, "server" )
+xgui.addSubModule( "ULX封禁信息", plist, nil, "server" )
 
 ------------------------------Echo-------------------------------
 local plist = xlib.makelistlayout{ w=275, h=322, parent=xgui.null }
-plist:Add( xlib.makelabel{ label="Command/Event echo settings" } )
-plist:Add( xlib.makecheckbox{ label="Echo players vote choices", repconvar="ulx_voteEcho" } )
-plist:Add( xlib.makecombobox{ repconvar="ulx_logEcho", isNumberConvar=true, choices={ "Do not echo admin commands", "Echo admin commands anonymously", "Echo commands and identify admin" } } )
-plist:Add( xlib.makecombobox{ repconvar="ulx_logSpawnsEcho", isNumberConvar=true, choices={ "Do not echo spawns", "Echo spawns to admins only", "Echo spawns to everyone" } } )
-plist:Add( xlib.makecheckbox{ label="Enable colored event echoes", repconvar="ulx_logEchoColors" } )
+plist:Add( xlib.makelabel{ label="命令/时间响应设置" } )
+plist:Add( xlib.makecheckbox{ label="响应玩家投票选择", repconvar="ulx_voteEcho" } )
+plist:Add( xlib.makecombobox{ repconvar="ulx_logEcho", isNumberConvar=true, choices={ "不响应管理员的命令", "匿名响应管理员的命令", "响应命令并指明管理员" } } )
+plist:Add( xlib.makecombobox{ repconvar="ulx_logSpawnsEcho", isNumberConvar=true, choices={ "不响应生成", "只对管理员响应生成", "对所有人响应生成" } } )
+plist:Add( xlib.makecheckbox{ label="启用有颜色的事件响应", repconvar="ulx_logEchoColors" } )
 
-plist:Add( xlib.makelabel{ label="Default text color" } )
+plist:Add( xlib.makelabel{ label="默认文字颜色" } )
 plist:Add( xlib.makecolorpicker{ repconvar="ulx_logEchoColorDefault", noalphamodetwo=true } )
-plist:Add( xlib.makelabel{ label="Color for console" } )
+plist:Add( xlib.makelabel{ label="控制台颜色" } )
 plist:Add( xlib.makecolorpicker{ repconvar="ulx_logEchoColorConsole", noalphamodetwo=true } )
-plist:Add( xlib.makelabel{ label="Color for self" } )
+plist:Add( xlib.makelabel{ label="自己的颜色" } )
 plist:Add( xlib.makecolorpicker{ repconvar="ulx_logEchoColorSelf", noalphamodetwo=true } )
-plist:Add( xlib.makelabel{ label="Color for everyone" } )
+plist:Add( xlib.makelabel{ label="所有人的颜色" } )
 plist:Add( xlib.makecolorpicker{ repconvar="ulx_logEchoColorEveryone", noalphamodetwo=true } )
-plist:Add( xlib.makecheckbox{ label="Show team colors for players", repconvar="ulx_logEchoColorPlayerAsGroup" } )
-plist:Add( xlib.makelabel{ label="Color for players (when above is disabled)" } )
+plist:Add( xlib.makecheckbox{ label="为玩家显示队伍颜色", repconvar="ulx_logEchoColorPlayerAsGroup" } )
+plist:Add( xlib.makelabel{ label="玩家的颜色（当上面被禁用时）" } )
 plist:Add( xlib.makecolorpicker{ repconvar="ulx_logEchoColorPlayer", noalphamodetwo=true } )
-plist:Add( xlib.makelabel{ label="Color for everything else" } )
+plist:Add( xlib.makelabel{ label="给其他的颜色" } )
 plist:Add( xlib.makecolorpicker{ repconvar="ulx_logEchoColorMisc", noalphamodetwo=true } )
-xgui.addSubModule( "ULX Command/Event Echoes", plist, nil, "server" )
+xgui.addSubModule( "ULX命令/事件响应", plist, nil, "server" )
 
 ------------------------General Settings-------------------------
 local plist = xlib.makelistlayout{ w=275, h=322, parent=xgui.null }

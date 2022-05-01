@@ -3,7 +3,7 @@
 
 local bans={}
 function bans.init()
-	ULib.ucl.registerAccess( "xgui_managebans", "superadmin", "Allows addition, removal, and viewing of bans in XGUI.", "XGUI" )
+	ULib.ucl.registerAccess( "xgui_managebans", "superadmin", "允许在XGUI中添加、移除和查看封禁。", "XGUI" )
 
 	xgui.addDataType( "bans", function() return { count=table.Count( ULib.bans ) } end, "xgui_managebans", 30, 20 )
 
@@ -30,7 +30,7 @@ function bans.init()
 	function bans.updateBan( ply, args )
 		local access, accessTag = ULib.ucl.query( ply, "ulx ban" )
 		if not access then
-			ULib.tsayError( ply, "Error editing ban: You must have access to ulx ban, " .. ply:Nick() .. "!", true )
+			ULib.tsayError( ply, "编辑封禁出错：你必须有权访问ulx ban，" .. ply:Nick() .. "！", true )
 			return
 		end
 
@@ -41,7 +41,7 @@ function bans.init()
 
 		-- Check steamid
 		if not ULib.isValidSteamID(steamID) then
-			ULib.tsayError( ply, "Invalid steamid", true )
+			ULib.tsayError( ply, "无效steamid", true )
 			return
 		end
 
@@ -56,7 +56,7 @@ function bans.init()
 		local argInfo = cmd.args[3]
 		local success, err = argInfo.type:parseAndValidate( ply, bantime, argInfo, accessPieces[2] )
 		if not success then
-			ULib.tsayError( ply, "Error editing ban: " .. err, true )
+			ULib.tsayError( ply, "编辑封禁出错：" .. err, true )
 			return
 		end
 
@@ -64,7 +64,7 @@ function bans.init()
 		local argInfo = cmd.args[4]
 		local success, err = argInfo.type:parseAndValidate( ply, reason, argInfo, accessPieces[3] )
 		if not success then
-			ULib.tsayError( ply, "Error editing ban: You did not specify a valid reason, " .. ply:Nick() .. "!", true )
+			ULib.tsayError( ply, "编辑封禁出错：你没有指明一个有效的封禁原因，" .. ply:Nick() .. "！", true )
 			return
 		end
 
@@ -285,8 +285,8 @@ function bans.init()
 		end
 	end
 
-	ulx.addToHelpManually( "Menus", "xgui fban", "<player> - Opens the add ban window, freezes the specified player, and fills out the Name/SteamID automatically. (say: !fban)" )
-	ulx.addToHelpManually( "Menus", "xgui xban", "<player> - Opens the add ban window and fills out Name/SteamID automatically if a player was specified. (say: !xban)" )
+	ulx.addToHelpManually( "菜单", "xgui fban", "<player> - 打开添加封禁窗口并冻结指定玩家，自动填写名称和SteamID（输入：!fban）" )
+	ulx.addToHelpManually( "菜单", "xgui xban", "<player> - 打开添加封禁窗口，如果指定了玩家则自动填写名称和SteamID（输入：!xban）" )
 end
 
 function bans.postinit()

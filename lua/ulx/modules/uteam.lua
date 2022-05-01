@@ -91,7 +91,7 @@ function ulx.refreshTeams()
 
 	for group_name, group_data in pairs( ULib.ucl.groups ) do
 		if group_data.team then
-			local team_name = group_data.team.name or ("Team" .. tostring( next_team_index ))
+			local team_name = group_data.team.name or ("队伍" .. tostring( next_team_index ))
 			group_data.team.name = team_name
 			local team_color
 			if group_data.team.color_red or group_data.team.color_green or group_data.team.color_blue then

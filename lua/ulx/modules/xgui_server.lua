@@ -25,31 +25,31 @@ function xgui.addSVModule( name, initFunc, postinitFunc )
 	end
 end
 
-Msg( "///////////////////////////////\n" )
-Msg( "// ULX GUI -- by Stickly Man //\n" )
-Msg( "///////////////////////////////\n" )
-Msg( "// Adding Main Modules..     //\n" )
+Msg( "///////////////////////////////////\n" )
+Msg( "// ULX用户界面 -- Stickly Man制作 //\n" )
+Msg( "///////////////////////////////////\n" )
+Msg( "// 添加主模块..                   //\n" )
 for _, file in ipairs( file.Find( "ulx/xgui/*.lua", "LUA" ) ) do
 	AddCSLuaFile( "ulx/xgui/" .. file )
 	Msg( "//  " .. file .. string.rep( " ", 25 - file:len() ) .. "//\n" )
 end
-Msg( "// Adding Setting Modules..  //\n" )
+Msg( "// 添加设置模块..                 //\n" )
 for _, file in ipairs( file.Find( "ulx/xgui/settings/*.lua", "LUA" ) ) do
 	AddCSLuaFile( "ulx/xgui/settings/" .. file )
 	Msg( "//  " .. file .. string.rep( " ", 25 - file:len() ) .. "//\n" )
 end
-Msg( "// Adding Gamemode Modules.. //\n" )
+Msg( "// 添加游戏模式模块..             //\n" )
 for _, file in ipairs( file.Find( "ulx/xgui/gamemodes/*.lua", "LUA" ) ) do
 	AddCSLuaFile( "ulx/xgui/gamemodes/" .. file )
 	Msg( "//  " .. file .. string.rep( " ", 25 - file:len() ) .. "//\n" )
 end
-Msg( "// Loading Server Modules..  //\n" )
+Msg( "// 加载服务器模块..               //\n" )
 for _, file in ipairs( file.Find( "ulx/xgui/server/*.lua", "LUA" ) ) do
 	include( "ulx/xgui/server/" .. file )
 	Msg( "//  " .. file .. string.rep( " ", 25 - file:len() ) .. "//\n" )
 end
-Msg( "// XGUI modules added!       //\n" )
-Msg( "///////////////////////////////\n" )
+Msg( "// 用户界面模块已加载！            //\n" )
+Msg( "///////////////////////////////////\n" )
 
 function xgui.init()
 	local function xgui_chatCommand( ply, func, args )
@@ -72,7 +72,7 @@ function xgui.init()
 		if xgui.cmds[name] then
 			xgui.cmds[name]( ply, args )
 		else
-			ULib.tsay( ply, "XGUI: Command " .. ( name or "<none>" ) .. " not recognized!" )
+			ULib.tsay( ply, "XGUI：命令 " .. ( name or "<无>" ) .. " 没有识别！" )
 		end
 	end
 	concommand.Add( "_xgui", xgui.cmd )
@@ -313,7 +313,7 @@ function xgui.init()
 	--Initialize the server modules!
 	for _, v in ipairs( xgui.svmodules ) do	v.init() end
 
-	ulx.addToHelpManually( "Menus", "xgui", "<show, hide, toggle> - Opens and/or closes XGUI. (say: !xgui, !menu) (alias: ulx menu)" )
+	ulx.addToHelpManually( "菜单", "xgui", "<显示、隐藏、切换> - 打开和/或关闭 XGUI，（说：!xgui、!menu）（别名：ulx menu）" )
 end
 
 --Init the code when the server is ready
@@ -327,7 +327,7 @@ function xgui.postInit()
 	for _, ply in pairs( player.GetAll() ) do
 		for UID, data in pairs( xgui.activeUsers ) do
 			if ply:UniqueID() == UID then
-				ULib.clientRPC( ply, "xgui.getChunk", -1, "Initializing..." )
+				ULib.clientRPC( ply, "xgui.getChunk", -1, "初始化..." )
 			end
 		end
 	end
