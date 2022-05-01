@@ -1,78 +1,67 @@
 local help = [[
-General User Management Concepts:
-User access is driven by ULib's Ulysses Control List (UCL). This list contains users and groups
-which in turn contains lists of allowed and denied accesses. The allow and deny lists contain
-access strings like "ulx slap" or "ulx phygunplayer" to show what a user and/or group does and does
-not have access to. If a user has "ulx slap" in their user allow list or in the allow list of one
-of the groups they belong to, they have access to slap. If a user has "ulx slap" in their user deny
-list they are DENIED the command, even if they have the command in one of their group's allow
-lists. In this way, deny takes precedence over allow.
+一般用户管理概念:
+用户权限由ULib的Ulysses Control List (UCL)控制。这个列表包含用户和用户组，
+也就是说其中包含允许与禁止的权限。允许与禁止的列表中包含着一些像“ulx slap”或“ulx phygunplayer”
+这样的字符串来表示一个用户和/或用户组有或没有权限来这么做。如果一个用户在他们的允许列表或他们所属的组中的
+允许列表中有“ulx slap”，那么他们就能够使用slap指令。如果一个用户在他们的禁止列表中有“ulx slap”，他们
+就 无权 使用该命令，即便他们其中一个用户组中的允许列表中有该命令也无法使用。意思就是说，禁止的优先级高于允许。
 
-ULib supports immunity by being able to specify what various users and groups are allowed to
-target. This is often used to make it so lower admins cannot target higher admins. EG, by default
-admins can't target superadmins, but superadmins can still target admins.
+ULib支持通过指定允许将哪些用户或用户组作为目标来提供免疫性。这经常被用来让相对低等级的管理员不能将高等级的
+管理员作为目标。例如：默认情况下，管理员不能将超级管理员作为目标，但是超级管理员仍然能将管理员作为目标。
 
 
-More Advanced Concepts:
-Groups have inheritance. You can specify what group they inherit from in the addgroup command. If a
-user is in a group that has inheritance, UCL will check all groups connected in the inheritance
-chain. Note that groups do not support deny lists for the sake of simplicity. If you feel that a
-group needs to be denied something, you should split your groups up instead.
+更加高级的概念:
+用户组拥有继承性。你可以在addgroup命令中指定他们应该从哪个组继承权限。如果一个用户在一个拥有继承性的用户组中，
+UCL会检查所有在继承链中的组。请注意，为了使其更加简单明了，用户组不支持禁止列表。如果你认为一个用户组应该被
+禁止做某些事，你应该把你的用户组分割开。
 
-The "user" group applies to everyone who does not otherwise belong in a group. You can use
-groupallow on this group just like any other, just remember that everyone is being allowed access.
+“user”用户组应用于所有不属于一个组中的人。你可以像其他用户组一样在这个用户组上使用groupallow命令，只需要牢记
+所有人都将会拥有相应的权限。
 
-ULib supports an advanced, highly configurable permission system by using "access tags". Access
-tags specify what a user is allowed to pass as arguments to a command. For example, you can make it
-so that admins are only allowed to slay users with "killme" somewhere in their name, or you can
-give everyone access to the "ulx teleport" command, but only allow them to teleport themselves.
+ULib支持一个使用“权限标签”的高级、高配置性的权限系统。权限标签指示了一个用户能够传递什么作为命令参数。
+举个例子，你可以让管理员只能够杀死名字中带有“killme”的用户，或者你可以给予所有人使用“ulx teleport”的权限，
+但是只允许他们传送他们自己。
 
-Examples of using access tags are given below in the userallow and groupallow commands. The format
-for access tags is as follows. Each argument that is passed to the command can be limited by the
-access tag. Each argument being limited must be listed in the same order as in the command,
-separated by spaces. If you don't want to limit an argument, use a star ("*"). EG, to limit "ulx
-slap" damage to 0 through 10, but still allow it to be used on anyone, use the tag "* 0:10".
+在下面的userallow和groupallow中已经给出了使用权限标签的例子。同时也给出了使用权限标签的格式。每个传递
+给命令的参数都可以被权限标签限制。每个被限制的参数都必须以其在命令中的相同顺序被列出，且使用空格来分隔。
+如果你不想限制一个参数，使用星号（“*”）即可。例如：要限制“ulx slap”的伤害范围为0到10，但仍然允许其在
+任何人身上使用，使用权限标签“* 0:10”即可。
 
-User Management Commands:
-ulx adduser <user> <group> - Add the specified CONNECTED player to the specified group.
-The group MUST exist for this command to succeed. Use operator, admin, superadmin, or see ulx
-addgroup. You can only specify one group. See above for explanation on immunity.
-Ex 1. ulx adduser "Someguy" superadmin  -- This will add the connected "Someguy" as a superadmin
-Ex 2. ulx adduser "Dood" monkey         -- This will add the connected "Dood" to the group monkey
-  on the condition that the group exists
+用户管理命令：
+ulx adduser <用户> <用户组> - 将指定的 在线 玩家添加到指定组。
+此命令要成功执行，指定组必须 存在。使用operator、admin、superadmin或看看ulx addgroup。
+你可以只指定一个组。关于免疫性的解释见上文。
+示例1：ulx adduser "某个人" superadmin  -- 这会将在线玩家“某个人”添加到超级管理员用户组
+示例2：ulx adduser "Dood" monkey        -- 这会将在线玩家“Dood”添加到monkey用户组（在用户组存在的前提下）
 
-ulx removeuser <user> - Remove the specified connected player from the permanent access list.
-Ex 1. ulx removeuser "Foo bar"            -- This removes the user "Foo bar"
+ulx removeuser <用户> - 将指定的在线玩家从永久权限列表中移除。
+示例1：ulx removeuser "Foo bar"            -- 这会移除用户“Foo bar”
 
-ulx userallow <user> <access> [<access tag>] - Puts the access on the USER'S ALLOW list, with
-  optional access tag (see above)
-See above for explanation of allow list vs. deny list, as well as how access strings/tags work.
-Ex 1. ulx userallow "Pi" "ulx slap"                 -- This grants the user access to "ulx slap"
-Ex 2. ulx userallow "Pi" "ulx slap" "!%admin 0"     -- This grants the user access to "ulx slap"
-  -- but they can only slap users lower than an admin, and they can only slap for 0 damage
+ulx userallow <用户> <权限> [<权限标签>] - 将权限放入 用户的允许列表 中，可以选择使用指定的权限标签（见上文）
+关于允许列表与禁止列表，以及权限字符串/标签的工作方式的解释见上文。
+示例1：ulx userallow "Pi" "ulx slap"                 -- 这允许用户使用命令“ulx slap”
+示例2：ulx userallow "Pi" "ulx slap" "!%admin 0"     -- 这允许用户使用命令“ulx slap”
+	-- 但他们只能够扇用户级别低于管理员的用户，并且他们只能够使用0伤害
 
-ulx userdeny <user> <access> [<revoke>] - Removes a player's access. If revoke is true, this simply
-  removes the access string from the user's allow/deny lists instead of adding it to the user's
-  deny list. See above for an explanation on the deny list.
+ulx userdeny <用户> <权限> [<剥夺>] - 移除一个玩家的权限。如果剥夺为true，这将会仅仅将权限字符串从用户的
+  允许/禁止列表中移除，而不是将它添加到用户的禁止列表。关于禁止名单的解释见上文。
 
-ulx addgroup <group> [<inherits from>] - Creates a group, optionally inheriting from the specified
-  group. See above for explanation on inheritance.
+ulx addgroup <用户组> [<继承自>] - 创建一个用户组，可以选择继承指定的组。
+  关于继承的解释见上文。
 
-ulx removegroup <group> - Removes a group PERMANENTLY. Also removes the group from all connected
-  users and all users who connect in the future. If a user has no group besides this, they will
-  become guests. Please be VERY careful with this command!
+ulx removegroup <用户组> - 永久 移除一个用户组。同时将已连接和未来连接服务器的玩家从该用户组中移出。如果一个
+  用户没有其它的用户组，他们会成为访客。使用此命令请加以 小心 。
 
-ulx renamegroup <current group> <new group> - Renames a group
+ulx renamegroup <当前组> <新组> - 重命名一个用户组
 
-ulx setgroupcantarget <group> [<target string>] - Limits what users a group can target. Pass no
-  argument to clear the restriction.
-Ex 1. ulx setgroupcantarget user !%admin - Guests cannot target admins or above
-Ex 2. ulx setgroupcantarget admin !^ - Admins cannot target themselves
+ulx setgroupcantarget <用户组> [<目标字符串>] - 限制一个用户组可以将哪些用户作为目标。传递空值以清除限制。
+示例1：ulx setgroupcantarget user !%admin - 访客不能将管理或以上级别的用户作为目标
+示例2：ulx setgroupcantarget admin !^ - 管理不能够将同组作为目标
 
-ulx groupallow <group> <access> [<access tag>] - Puts the access on the group's allow list. See
-  above on how access strings/tags work.
+ulx groupallow <用户组> <权限> [<权限标签>] - 将权限添加至用户组的允许列表中。关于权限字符串/标签的工作方式的
+  解释见上文。
 
-ulx groupdeny <group> <access> - Removes the group's access.
+ulx groupdeny <用户组> <权限> - 移除用户组的权限。
 
 
 ]]
