@@ -295,7 +295,7 @@ function ulx.debuginfo( calling_ply )
 	str = str .. "专用服务器：" .. tostring( game.IsDedicated() ) .. "\n\n"
 
 	local players = player.GetAll()
-	str = str .. string.format( "当前连接的玩家：\昵称%s steamid%s uid%s id 服主\n", str.rep( " ", 27 ), str.rep( " ", 12 ), str.rep( " ", 7 ) )
+	str = str .. string.format( "当前连接的玩家：\n昵称%s steamid%s uid%s id 服主\n", str.rep( " ", 27 ), str.rep( " ", 12 ), str.rep( " ", 7 ) )
 	for _, ply in ipairs( players ) do
 		local id = string.format( "%i", ply:EntIndex() )
 		local steamid = ply:SteamID()
