@@ -1,20 +1,20 @@
-local CATEGORY_NAME = "User Management"
+local CATEGORY_NAME = "用户管理"
 
 local function checkForValidId( calling_ply, id )
 	if id == "BOT" or id == "NULL" then -- Bot check
 		return true
 	elseif id:find( "%." ) then -- Assume IP and check
 	 	if not ULib.isValidIP( id ) then
-			ULib.tsayError( calling_ply, "Invalid IP.", true )
+			ULib.tsayError( calling_ply, "无效IP。", true )
 			return false
 		end
 	elseif id:find( ":" ) then
 	 	if not ULib.isValidSteamID( id ) then -- Assume steamid and check
-			ULib.tsayError( calling_ply, "Invalid steamid.", true )
+			ULib.tsayError( calling_ply, "无效steamid。", true )
 			return false
 		end
 	elseif not tonumber( id ) then -- Assume uniqueid and check
-		ULib.tsayError( calling_ply, "Invalid Unique ID", true )
+		ULib.tsayError( calling_ply, "无效Unique ID", true )
 		return false
 	end
 
@@ -46,7 +46,7 @@ function ulx.usermanagementhelp( calling_ply )
 end
 local usermanagementhelp = ulx.command( CATEGORY_NAME, "ulx usermanagementhelp", ulx.usermanagementhelp )
 usermanagementhelp:defaultAccess( ULib.ACCESS_ALL )
-usermanagementhelp:help( "See the user management help." )
+usermanagementhelp:help( "查看用户管理帮助" )
 
 function ulx.adduser( calling_ply, target_ply, group_name )
 	local userInfo = ULib.ucl.authed[ target_ply:UniqueID() ]
@@ -56,13 +56,13 @@ function ulx.adduser( calling_ply, target_ply, group_name )
 
 	ULib.ucl.addUser( id, userInfo.allow, userInfo.deny, group_name )
 
-	ulx.fancyLogAdmin( calling_ply, "#A added #T to group #s", target_ply, group_name )
+	ulx.fancyLogAdmin( calling_ply, "#A 将 #T 添加到 #s 用户组", target_ply, group_name )
 end
 local adduser = ulx.command( CATEGORY_NAME, "ulx adduser", ulx.adduser, nil, false, false, true )
 adduser:addParam{ type=ULib.cmds.PlayerArg }
-adduser:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names_no_user, hint="group", error="invalid group \"%s\" specified", ULib.cmds.restrictToCompletes }
+adduser:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names_no_user, hint="用户组", error="指定的用户组 \"%s\" 无效", ULib.cmds.restrictToCompletes }
 adduser:defaultAccess( ULib.ACCESS_SUPERADMIN )
-adduser:help( "Add a user to specified group." )
+adduser:help( "将一个用户添加到指定用户组。" )
 
 function ulx.adduserid( calling_ply, id, group_name )
 	id = id:upper() -- Steam id needs to be upper
@@ -75,26 +75,26 @@ function ulx.adduserid( calling_ply, id, group_name )
 	ULib.ucl.addUser( id, userInfo.allow, userInfo.deny, group_name )
 
 	if ULib.ucl.users[ id ] and ULib.ucl.users[ id ].name then
-		ulx.fancyLogAdmin( calling_ply, "#A added #s to group #s", ULib.ucl.users[ id ].name, group_name )
+		ulx.fancyLogAdmin( calling_ply, "#A 将 #s 添加到 #s 用户组", ULib.ucl.users[ id ].name, group_name )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A added userid #s to group #s", id, group_name )
+		ulx.fancyLogAdmin( calling_ply, "#A 将ID #s 添加到 #s 用户组", id, group_name )
 	end
 end
 local adduserid = ulx.command( CATEGORY_NAME, "ulx adduserid", ulx.adduserid, nil, false, false, true )
-adduserid:addParam{ type=ULib.cmds.StringArg, hint="SteamID, IP, or UniqueID" }
-adduserid:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names_no_user, hint="group", error="invalid group \"%s\" specified", ULib.cmds.restrictToCompletes }
+adduserid:addParam{ type=ULib.cmds.StringArg, hint="SteamID、IP或UniqueID" }
+adduserid:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names_no_user, hint="用户组", error="指定的用户组 \"%s\" 无效", ULib.cmds.restrictToCompletes }
 adduserid:defaultAccess( ULib.ACCESS_SUPERADMIN )
-adduserid:help( "Add a user by ID to specified group." )
+adduserid:help( "使用ID将一个用户添加到指定用户组。" )
 
 function ulx.removeuser( calling_ply, target_ply )
 	ULib.ucl.removeUser( target_ply:UniqueID() )
 
-	ulx.fancyLogAdmin( calling_ply, "#A removed all access rights from #T", target_ply )
+	ulx.fancyLogAdmin( calling_ply, "#A 剥夺了 #T 的所有权限。", target_ply )
 end
 local removeuser = ulx.command( CATEGORY_NAME, "ulx removeuser", ulx.removeuser, nil, false, false, true )
 removeuser:addParam{ type=ULib.cmds.PlayerArg }
 removeuser:defaultAccess( ULib.ACCESS_SUPERADMIN )
-removeuser:help( "Permanently removes a user's access." )
+removeuser:help( "永久移除一个用户的权限。" )
 
 function ulx.removeuserid( calling_ply, id )
 	id = id:upper() -- Steam id needs to be upper
@@ -103,7 +103,7 @@ function ulx.removeuserid( calling_ply, id )
 	if not checkForValidId( calling_ply, id ) then return false end
 
 	if not ULib.ucl.authed[ id ] and not ULib.ucl.users[ id ] then
-		ULib.tsayError( calling_ply, "No player with id \"" .. id .. "\" exists in the ULib user list", true )
+		ULib.tsayError( calling_ply, "无法在ULib用户列表中找到ID为 \"" .. id .. "\" 的用户", true )
 		return false
 	end
 
@@ -112,15 +112,15 @@ function ulx.removeuserid( calling_ply, id )
 	ULib.ucl.removeUser( id )
 
 	if name then
-		ulx.fancyLogAdmin( calling_ply, "#A removed all access rights from #s", name )
+		ulx.fancyLogAdmin( calling_ply, "#A 剥夺了 #s 的所有权限", name )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A removed all access rights from #s", id )
+		ulx.fancyLogAdmin( calling_ply, "#A 剥夺了 #s 的所有权限", id )
 	end
 end
 local removeuserid = ulx.command( CATEGORY_NAME, "ulx removeuserid", ulx.removeuserid, nil, false, false, true )
-removeuserid:addParam{ type=ULib.cmds.StringArg, hint="SteamID, IP, or UniqueID" }
+removeuserid:addParam{ type=ULib.cmds.StringArg, hint="SteamID、IP或UniqueID" }
 removeuserid:defaultAccess( ULib.ACCESS_SUPERADMIN )
-removeuserid:help( "Permanently removes a user's access by ID." )
+removeuserid:help( "使用ID永久移除一个用户的权限。" )
 
 function ulx.userallow( calling_ply, target_ply, access_string, access_tag )
 	if access_tag then access_tag = access_tag end
@@ -137,21 +137,21 @@ function ulx.userallow( calling_ply, target_ply, access_string, access_tag )
 
 	local success = ULib.ucl.userAllow( id, accessTable )
 	if not success then
-		ULib.tsayError( calling_ply, string.format( "User \"%s\" already has access to \"%s\"", target_ply:Nick(), access_string ), true )
+		ULib.tsayError( calling_ply, string.format( "用户 \"%s\" 已经拥有使用 \"%s\" 的权限", target_ply:Nick(), access_string ), true )
 	else
 		if not access_tag or access_tag == "" then
-			ulx.fancyLogAdmin( calling_ply, "#A granted access #q to #T", access_string, target_ply )
+			ulx.fancyLogAdmin( calling_ply, "#A 将 #q 授权给 #T", access_string, target_ply )
 		else
-			ulx.fancyLogAdmin( calling_ply, "#A granted access #q with tag #q to #T", access_string, access_tag, target_ply )
+			ulx.fancyLogAdmin( calling_ply, "#A 将 #q 带标签 #q 授权给 #T", access_string, access_tag, target_ply )
 		end
 	end
 end
 local userallow = ulx.command( CATEGORY_NAME, "ulx userallow", ulx.userallow, nil, false, false, true )
 userallow:addParam{ type=ULib.cmds.PlayerArg }
-userallow:addParam{ type=ULib.cmds.StringArg, hint="command" } -- TODO, add completes for this
-userallow:addParam{ type=ULib.cmds.StringArg, hint="access tag", ULib.cmds.optional }
+userallow:addParam{ type=ULib.cmds.StringArg, hint="命令" } -- TODO, add completes for this
+userallow:addParam{ type=ULib.cmds.StringArg, hint="权限标签", ULib.cmds.optional }
 userallow:defaultAccess( ULib.ACCESS_SUPERADMIN )
-userallow:help( "Add to a user's access." )
+userallow:help( "添加到用户的授权列表。" )
 
 function ulx.userallowid( calling_ply, id, access_string, access_tag )
 	if access_tag then access_tag = access_tag end
@@ -161,7 +161,7 @@ function ulx.userallowid( calling_ply, id, access_string, access_tag )
 	if not checkForValidId( calling_ply, id ) then return false end
 
 	if not ULib.ucl.authed[ id ] and not ULib.ucl.users[ id ] then
-		ULib.tsayError( calling_ply, "No player with id \"" .. id .. "\" exists in the ULib user list", true )
+		ULib.tsayError( calling_ply, "无法在ULib用户列表中找到ID为 \"" .. id .. "\" 的用户", true )
 		return false
 	end
 
@@ -175,21 +175,21 @@ function ulx.userallowid( calling_ply, id, access_string, access_tag )
 	local success = ULib.ucl.userAllow( id, accessTable )
 	local name = (ULib.ucl.authed[ id ] and ULib.ucl.authed[ id ].name) or (ULib.ucl.users[ id ] and ULib.ucl.users[ id ].name) or id
 	if not success then
-		ULib.tsayError( calling_ply, string.format( "User \"%s\" already has access to \"%s\"", name, access_string ), true )
+		ULib.tsayError( calling_ply, string.format( "用户 \"%s\" 已经拥有使用 \"%s\" 的权限", name, access_string ), true )
 	else
 		if not access_tag or access_tag == "" then
-			ulx.fancyLogAdmin( calling_ply, "#A granted access #q to #s", access_string, name )
+			ulx.fancyLogAdmin( calling_ply, "#A 将 #q 授权给 #s", access_string, name )
 		else
-			ulx.fancyLogAdmin( calling_ply, "#A granted access #q with tag #q to #s", access_string, access_tag, name )
+			ulx.fancyLogAdmin( calling_ply, "#A 将 #q 带标签 #q 授权给 #s", access_string, access_tag, name )
 		end
 	end
 end
 local userallowid = ulx.command( CATEGORY_NAME, "ulx userallowid", ulx.userallowid, nil, false, false, true )
-userallowid:addParam{ type=ULib.cmds.StringArg, hint="SteamID, IP, or UniqueID" }
-userallowid:addParam{ type=ULib.cmds.StringArg, hint="command" } -- TODO, add completes for this
-userallowid:addParam{ type=ULib.cmds.StringArg, hint="access tag", ULib.cmds.optional }
+userallowid:addParam{ type=ULib.cmds.StringArg, hint="SteamID、IP或UniqueID" }
+userallowid:addParam{ type=ULib.cmds.StringArg, hint="命令" } -- TODO, add completes for this
+userallowid:addParam{ type=ULib.cmds.StringArg, hint="权限标签", ULib.cmds.optional }
 userallowid:defaultAccess( ULib.ACCESS_SUPERADMIN )
-userallowid:help( "Add to a user's access." )
+userallowid:help( "添加到用户的授权列表。" )
 
 function ulx.userdeny( calling_ply, target_ply, access_string, should_use_neutral )
 	local success = ULib.ucl.userAllow( target_ply:UniqueID(), access_string, should_use_neutral, true )
@@ -199,24 +199,24 @@ function ulx.userdeny( calling_ply, target_ply, access_string, should_use_neutra
 
 	if should_use_neutral then
 		if success then
-			ulx.fancyLogAdmin( calling_ply, "#A made access #q neutral to #T", access_string, target_ply )
+			ulx.fancyLogAdmin( calling_ply, "#A 将权限 #q 对 #T 显为中性", access_string, target_ply )
 		else
-			ULib.tsayError( calling_ply, string.format( "User \"%s\" isn't denied or allowed access to \"%s\"", target_ply:Nick(), access_string ), true )
+			ULib.tsayError( calling_ply, string.format( "用户 \"%s\" 并没有被允许或阻止使用 \"%s\"", target_ply:Nick(), access_string ), true )
 		end
 	else
 		if not success then
-			ULib.tsayError( calling_ply, string.format( "User \"%s\" is already denied access to \"%s\"", target_ply:Nick(), access_string ), true )
+			ULib.tsayError( calling_ply, string.format( "用户 \"%s\" 已经被阻止使用 \"%s\"", target_ply:Nick(), access_string ), true )
 		else
-			ulx.fancyLogAdmin( calling_ply, "#A denied access #q to #T", access_string, target_ply )
+			ulx.fancyLogAdmin( calling_ply, "#A 将 #q 禁止给 #T 使用", access_string, target_ply )
 		end
 	end
 end
 local userdeny = ulx.command( CATEGORY_NAME, "ulx userdeny", ulx.userdeny, nil, false, false, true )
 userdeny:addParam{ type=ULib.cmds.PlayerArg }
-userdeny:addParam{ type=ULib.cmds.StringArg, hint="command" } -- TODO, add completes for this
-userdeny:addParam{ type=ULib.cmds.BoolArg, hint="remove explicit allow or deny instead of outright denying", ULib.cmds.optional }
+userdeny:addParam{ type=ULib.cmds.StringArg, hint="命令" } -- TODO, add completes for this
+userdeny:addParam{ type=ULib.cmds.BoolArg, hint="是否将其设置为不指定允许或禁止，而不是直接禁止", ULib.cmds.optional }
 userdeny:defaultAccess( ULib.ACCESS_SUPERADMIN )
-userdeny:help( "Remove from a user's access." )
+userdeny:help( "从一个用户的授权列表中移除。" )
 
 function ulx.userdenyid( calling_ply, id, access_string, should_use_neutral )
 	id = id:upper() -- Steam id needs to be upper
@@ -225,7 +225,7 @@ function ulx.userdenyid( calling_ply, id, access_string, should_use_neutral )
 	if not checkForValidId( calling_ply, id ) then return false end
 
 	if not ULib.ucl.authed[ id ] and not ULib.ucl.users[ id ] then
-		ULib.tsayError( calling_ply, "No player with id \"" .. id .. "\" exists in the ULib user list", true )
+		ULib.tsayError( calling_ply, "无法在ULib用户列表中找到ID为 \"" .. id .. "\" 的用户", true )
 		return false
 	end
 
@@ -237,83 +237,83 @@ function ulx.userdenyid( calling_ply, id, access_string, should_use_neutral )
 	local name = (ULib.ucl.authed[ id ] and ULib.ucl.authed[ id ].name) or (ULib.ucl.users[ id ] and ULib.ucl.users[ id ].name) or id
 	if should_use_neutral then
 		if success then
-			ulx.fancyLogAdmin( calling_ply, "#A made access #q neutral to #s", access_string, name )
+			ulx.fancyLogAdmin( calling_ply, "#A 将权限 #q 对 #T 显为中性", access_string, name )
 		else
-			ULib.tsayError( calling_ply, string.format( "User \"%s\" isn't denied or allowed access to \"%s\"", name, access_string ), true )
+			ULib.tsayError( calling_ply, string.format( "用户 \"%s\" 并没有被允许或阻止使用 \"%s\"", name, access_string ), true )
 		end
 	else
 		if not success then
-			ULib.tsayError( calling_ply, string.format( "User \"%s\" is already denied access to \"%s\"", name, access_string ), true )
+			ULib.tsayError( calling_ply, string.format( "用户 \"%s\" 已经被阻止使用 \"%s\"", name, access_string ), true )
 		else
-			ulx.fancyLogAdmin( calling_ply, "#A denied access #q to #s", access_string, name )
+			ulx.fancyLogAdmin( calling_ply, "#A 将 #q 禁止给 #T 使用", access_string, name )
 		end
 	end
 end
 local userdenyid = ulx.command( CATEGORY_NAME, "ulx userdenyid", ulx.userdenyid, nil, false, false, true )
-userdenyid:addParam{ type=ULib.cmds.StringArg, hint="SteamID, IP, or UniqueID" }
-userdenyid:addParam{ type=ULib.cmds.StringArg, hint="command" } -- TODO, add completes for this
-userdenyid:addParam{ type=ULib.cmds.BoolArg, hint="remove explicit allow or deny instead of outright denying", ULib.cmds.optional }
+userdenyid:addParam{ type=ULib.cmds.StringArg, hint="SteamID、IP或UniqueID" }
+userdenyid:addParam{ type=ULib.cmds.StringArg, hint="命令" } -- TODO, add completes for this
+userdenyid:addParam{ type=ULib.cmds.BoolArg, hint="是否将其设置为不指定允许或禁止，而不是直接禁止", ULib.cmds.optional }
 userdenyid:defaultAccess( ULib.ACCESS_SUPERADMIN )
-userdenyid:help( "Remove from a user's access." )
+userdenyid:help( "从一个用户的授权列表中移除。" )
 
 function ulx.addgroup( calling_ply, group_name, inherit_from )
 	if ULib.ucl.groups[ group_name ] ~= nil then
-		ULib.tsayError( calling_ply, "This group already exists!", true )
+		ULib.tsayError( calling_ply, "这个用户组已经存在！", true )
 		return
 	end
 
 	if not ULib.ucl.groups[ inherit_from ] then
-		ULib.tsayError( calling_ply, "The group you specified for inheritence doesn't exist!", true )
+		ULib.tsayError( calling_ply, "你所指定的继承组并不存在！", true )
 		return
 	end
 
 	ULib.ucl.addGroup( group_name, _, inherit_from )
-	ulx.fancyLogAdmin( calling_ply, "#A created group #s which inherits rights from group #s", group_name, inherit_from )
+	ulx.fancyLogAdmin( calling_ply, "#A 创建了 #s 用户组并从 #s 继承权限", group_name, inherit_from )
 end
 local addgroup = ulx.command( CATEGORY_NAME, "ulx addgroup", ulx.addgroup, nil, false, false, true )
-addgroup:addParam{ type=ULib.cmds.StringArg, hint="group" }
-addgroup:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names, hint="inherits from", error="invalid group \"%s\" specified", ULib.cmds.restrictToCompletes, default="user", ULib.cmds.optional }
+addgroup:addParam{ type=ULib.cmds.StringArg, hint="用户组" }
+addgroup:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names, hint="继承自", error="指定的用户组 \"%s\" 无效", ULib.cmds.restrictToCompletes, default="user", ULib.cmds.optional }
 addgroup:defaultAccess( ULib.ACCESS_SUPERADMIN )
-addgroup:help( "Create a new group with optional inheritance." )
+addgroup:help( "使用可选的继承权限创建用户组。" )
 
 function ulx.renamegroup( calling_ply, current_group, new_group )
 	if ULib.ucl.groups[ new_group ] then
-		ULib.tsayError( calling_ply, "The target group already exists!", true )
+		ULib.tsayError( calling_ply, "目标组已经存在！", true )
 		return
 	end
 
 	ULib.ucl.renameGroup( current_group, new_group )
-	ulx.fancyLogAdmin( calling_ply, "#A renamed group #s to #s", current_group, new_group )
+	ulx.fancyLogAdmin( calling_ply, "#A 将用户组 #s 重命名为 #s", current_group, new_group )
 end
 local renamegroup = ulx.command( CATEGORY_NAME, "ulx renamegroup", ulx.renamegroup, nil, false, false, true )
-renamegroup:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names_no_user, hint="current group", error="invalid group \"%s\" specified", ULib.cmds.restrictToCompletes }
-renamegroup:addParam{ type=ULib.cmds.StringArg, hint="new group" }
+renamegroup:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names_no_user, hint="当前组", error="指定的用户组 \"%s\" 无效", ULib.cmds.restrictToCompletes }
+renamegroup:addParam{ type=ULib.cmds.StringArg, hint="新组" }
 renamegroup:defaultAccess( ULib.ACCESS_SUPERADMIN )
-renamegroup:help( "Renames a group." )
+renamegroup:help( "重命名一个用户组。" )
 
 function ulx.setGroupCanTarget( calling_ply, group, can_target )
 	if can_target and can_target ~= "" and can_target ~= "*" then
 		ULib.ucl.setGroupCanTarget( group, can_target )
-		ulx.fancyLogAdmin( calling_ply, "#A changed group #s to only be able to target #s", group, can_target )
+		ulx.fancyLogAdmin( calling_ply, "#A 使 #s 用户组只能将 #s 作为目标", group, can_target )
 	else
 		ULib.ucl.setGroupCanTarget( group, nil )
-		ulx.fancyLogAdmin( calling_ply, "#A changed group #s to be able to target anyone", group )
+		ulx.fancyLogAdmin( calling_ply, "#A 使 #s 用户组能将所有人作为目标", group )
 	end
 end
 local setgroupcantarget = ulx.command( CATEGORY_NAME, "ulx setgroupcantarget", ulx.setGroupCanTarget, nil, false, false, true )
-setgroupcantarget:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names, hint="group", error="invalid group \"%s\" specified", ULib.cmds.restrictToCompletes }
-setgroupcantarget:addParam{ type=ULib.cmds.StringArg, hint="target string", ULib.cmds.optional }
+setgroupcantarget:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names, hint="用户组", error="指定的用户组 \"%s\" 无效", ULib.cmds.restrictToCompletes }
+setgroupcantarget:addParam{ type=ULib.cmds.StringArg, hint="目标字符串", ULib.cmds.optional }
 setgroupcantarget:defaultAccess( ULib.ACCESS_SUPERADMIN )
-setgroupcantarget:help( "Sets what a group is allowed to target" )
+setgroupcantarget:help( "设置一个用户组能够将谁作为目标" )
 
 function ulx.removegroup( calling_ply, group_name )
 	ULib.ucl.removeGroup( group_name )
-	ulx.fancyLogAdmin( calling_ply, "#A removed group #s", group_name )
+	ulx.fancyLogAdmin( calling_ply, "#A 移除了用户组 #s", group_name )
 end
 local removegroup = ulx.command( CATEGORY_NAME, "ulx removegroup", ulx.removegroup, nil, false, false, true )
-removegroup:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names_no_user, hint="group", error="invalid group \"%s\" specified", ULib.cmds.restrictToCompletes }
+removegroup:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names_no_user, hint="用户组", error="指定的用户组 \"%s\" 无效", ULib.cmds.restrictToCompletes }
 removegroup:defaultAccess( ULib.ACCESS_SUPERADMIN )
-removegroup:help( "Removes a group. USE WITH CAUTION." )
+removegroup:help( "移除一个用户组。谨慎使用。" )
 
 function ulx.groupallow( calling_ply, group_name, access_string, access_tag )
 	access_tag = access_tag
@@ -327,21 +327,21 @@ function ulx.groupallow( calling_ply, group_name, access_string, access_tag )
 
 	local success = ULib.ucl.groupAllow( group_name, accessTable )
 	if not success then
-		ULib.tsayError( calling_ply, string.format( "Group \"%s\" already has access to \"%s\"", group_name, access_string ), true )
+		ULib.tsayError( calling_ply, string.format( "用户组 \"%s\" 已经有权使用 \"%s\"", group_name, access_string ), true )
 	else
 		if not access_tag or access_tag == "" then
-			ulx.fancyLogAdmin( calling_ply, "#A granted access #q to group #s", access_string, group_name )
+			ulx.fancyLogAdmin( calling_ply, "#A 将 #q 授权给用户组 #s", access_string, group_name )
 		else
-			ulx.fancyLogAdmin( calling_ply, "#A granted access #q with tag #q to group #s", access_string, access_tag, group_name )
+			ulx.fancyLogAdmin( calling_ply, "#A 将 #q 带标签 #q 授权给用户组 #s", access_string, access_tag, group_name )
 		end
 	end
 end
 local groupallow = ulx.command( CATEGORY_NAME, "ulx groupallow", ulx.groupallow, nil, false, false, true )
-groupallow:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names, hint="group", error="invalid group \"%s\" specified", ULib.cmds.restrictToCompletes }
-groupallow:addParam{ type=ULib.cmds.StringArg, hint="command" } -- TODO, add completes for this
-groupallow:addParam{ type=ULib.cmds.StringArg, hint="access tag", ULib.cmds.optional }
+groupallow:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names, hint="用户组", error="指定的用户组 \"%s\" 无效", ULib.cmds.restrictToCompletes }
+groupallow:addParam{ type=ULib.cmds.StringArg, hint="命令" } -- TODO, add completes for this
+groupallow:addParam{ type=ULib.cmds.StringArg, hint="权限标签", ULib.cmds.optional }
 groupallow:defaultAccess( ULib.ACCESS_SUPERADMIN )
-groupallow:help( "Add to a group's access." )
+groupallow:help( "添加到一个用户组的授权列表。" )
 
 function ulx.groupdeny( calling_ply, group_name, access_string )
 	local accessTable
@@ -353,13 +353,13 @@ function ulx.groupdeny( calling_ply, group_name, access_string )
 
 	local success = ULib.ucl.groupAllow( group_name, access_string, true )
 	if success then
-		ulx.fancyLogAdmin( calling_ply, "#A revoked access #q to group #s", access_string, group_name )
+		ulx.fancyLogAdmin( calling_ply, "#A 剥夺了用户组 #s 使用 #q 的权限", group_name, access_string )
 	else
-		ULib.tsayError( calling_ply, string.format( "Group \"%s\" doesn't have access to \"%s\"", group_name, access_string ), true )
+		ULib.tsayError( calling_ply, string.format( "用户组 \"%s\" 并无权使用 \"%s\"", group_name, access_string ), true )
 	end
 end
 local groupdeny = ulx.command( CATEGORY_NAME, "ulx groupdeny", ulx.groupdeny, nil, false, false, true )
-groupdeny:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names, hint="group", error="invalid group \"%s\" specified", ULib.cmds.restrictToCompletes }
-groupdeny:addParam{ type=ULib.cmds.StringArg, hint="command" } -- TODO, add completes for this
+groupdeny:addParam{ type=ULib.cmds.StringArg, completes=ulx.group_names, hint="用户组", error="指定的用户组 \"%s\" 无效", ULib.cmds.restrictToCompletes }
+groupdeny:addParam{ type=ULib.cmds.StringArg, hint="命令" } -- TODO, add completes for this
 groupdeny:defaultAccess( ULib.ACCESS_SUPERADMIN )
-groupdeny:help( "Remove from a group's access." )
+groupdeny:help( "从一个用户组的授权列表中移除。" )

@@ -1,9 +1,9 @@
-local CATEGORY_NAME = "Utility"
+local CATEGORY_NAME = "杂项"
 
 ------------------------------ Who ------------------------------
 function ulx.who( calling_ply, steamid )
 	if not steamid or steamid == "" then
-		ULib.console( calling_ply, "ID Name                            Group" )
+		ULib.console( calling_ply, "ID 名称                            用户组" )
 
 		local players = player.GetAll()
 		for _, player in ipairs( players ) do
@@ -19,11 +19,11 @@ function ulx.who( calling_ply, steamid )
 		data = ULib.ucl.getUserInfoFromID( steamid )
 
 		if not data then
-			ULib.console( calling_ply, "No information for provided id exists" )
+			ULib.console( calling_ply, "并没有和提供的ID有关的信息" )
 		else
-			ULib.console( calling_ply, "   ID: " .. steamid )
-			ULib.console( calling_ply, " Name: " .. data.name )
-			ULib.console( calling_ply, "Group: " .. data.group )
+			ULib.console( calling_ply, "    ID: " .. steamid )
+			ULib.console( calling_ply, "  名称: " .. data.name )
+			ULib.console( calling_ply, "用户组: " .. data.group )
 		end
 
 
@@ -32,23 +32,24 @@ end
 local who = ulx.command( CATEGORY_NAME, "ulx who", ulx.who )
 who:addParam{ type=ULib.cmds.StringArg, hint="steamid", ULib.cmds.optional }
 who:defaultAccess( ULib.ACCESS_ALL )
-who:help( "See information about currently online users." )
+who:help( "查看和当前在线玩家有关的信息。" )
 
 ------------------------------ Version ------------------------------
 function ulx.versionCmd( calling_ply )
 	ULib.tsay( calling_ply, "ULib " .. ULib.pluginVersionStr("ULib"), true )
 	ULib.tsay( calling_ply, "ULX " .. ULib.pluginVersionStr("ULX"), true )
+	ULib.tsay( calling_ply, "由洛雨(https://github.com/YUCLing)汉化", true )
 end
 local version = ulx.command( CATEGORY_NAME, "ulx version", ulx.versionCmd, "!version" )
 version:defaultAccess( ULib.ACCESS_ALL )
-version:help( "See version information." )
+version:help( "查看版本信息。" )
 
 ------------------------------ Map ------------------------------
 function ulx.map( calling_ply, map, gamemode )
 	if not gamemode or gamemode == "" then
-		ulx.fancyLogAdmin( calling_ply, "#A changed the map to #s", map )
+		ulx.fancyLogAdmin( calling_ply, "#A 将地图改为 #s", map )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A changed the map to #s with gamemode #s", map, gamemode )
+		ulx.fancyLogAdmin( calling_ply, "#A 将地图改为 #s 并将游戏模式设置为 #s", map, gamemode )
 	end
 	if gamemode and gamemode ~= "" then
 		game.ConsoleCommand( "gamemode " .. gamemode .. "\n" )
@@ -56,59 +57,59 @@ function ulx.map( calling_ply, map, gamemode )
 	game.ConsoleCommand( "changelevel " .. map ..  "\n" )
 end
 local map = ulx.command( CATEGORY_NAME, "ulx map", ulx.map, "!map" )
-map:addParam{ type=ULib.cmds.StringArg, completes=ulx.maps, hint="map", error="invalid map \"%s\" specified", ULib.cmds.restrictToCompletes }
-map:addParam{ type=ULib.cmds.StringArg, completes=ulx.gamemodes, hint="gamemode", error="invalid gamemode \"%s\" specified", ULib.cmds.restrictToCompletes, ULib.cmds.optional }
+map:addParam{ type=ULib.cmds.StringArg, completes=ulx.maps, hint="地图", error="指定的地图 \"%s\" 无效", ULib.cmds.restrictToCompletes }
+map:addParam{ type=ULib.cmds.StringArg, completes=ulx.gamemodes, hint="gamemode", error="指定的游戏模式 \"%s\" 无效", ULib.cmds.restrictToCompletes, ULib.cmds.optional }
 map:defaultAccess( ULib.ACCESS_ADMIN )
-map:help( "Changes map and gamemode." )
+map:help( "修改地图和游戏模式。" )
 
 function ulx.kick( calling_ply, target_ply, reason )
 	if target_ply:IsListenServerHost() then
-		ULib.tsayError( calling_ply, "This player is immune to kicking", true )
+		ULib.tsayError( calling_ply, "该玩家对踢出免疫", true )
 		return
 	end
 
 	if reason and reason ~= "" then
-		ulx.fancyLogAdmin( calling_ply, "#A kicked #T (#s)", target_ply, reason )
+		ulx.fancyLogAdmin( calling_ply, "#A 踢出了 #T （#s）", target_ply, reason )
 	else
 		reason = nil
-		ulx.fancyLogAdmin( calling_ply, "#A kicked #T", target_ply )
+		ulx.fancyLogAdmin( calling_ply, "#A 踢出了 #T", target_ply )
 	end
 	-- Delay by 1 frame to ensure the chat hook finishes with player intact. Prevents a crash.
 	ULib.queueFunctionCall( ULib.kick, target_ply, reason, calling_ply )
 end
 local kick = ulx.command( CATEGORY_NAME, "ulx kick", ulx.kick, "!kick" )
 kick:addParam{ type=ULib.cmds.PlayerArg }
-kick:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
+kick:addParam{ type=ULib.cmds.StringArg, hint="原因", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
 kick:defaultAccess( ULib.ACCESS_ADMIN )
-kick:help( "Kicks target." )
+kick:help( "踢出目标。" )
 
 ------------------------------ Ban ------------------------------
 function ulx.ban( calling_ply, target_ply, minutes, reason )
 	if target_ply:IsListenServerHost() or target_ply:IsBot() then
-		ULib.tsayError( calling_ply, "This player is immune to banning", true )
+		ULib.tsayError( calling_ply, "该玩家对封禁免疫", true )
 		return
 	end
 
-	local time = "for #s"
-	if minutes == 0 then time = "permanently" end
-	local str = "#A banned #T " .. time
-	if reason and reason ~= "" then str = str .. " (#s)" end
+	local time = "，时长为 #s"
+	if minutes == 0 then time = "，此封禁为永久封禁" end
+	local str = "#A 封禁了 #T " .. time
+	if reason and reason ~= "" then str = str .. " （#s）" end
 	ulx.fancyLogAdmin( calling_ply, str, target_ply, minutes ~= 0 and ULib.secondsToStringTime( minutes * 60 ) or reason, reason )
 	-- Delay by 1 frame to ensure any chat hook finishes with player intact. Prevents a crash.
 	ULib.queueFunctionCall( ULib.kickban, target_ply, minutes, reason, calling_ply )
 end
 local ban = ulx.command( CATEGORY_NAME, "ulx ban", ulx.ban, "!ban", false, false, true )
 ban:addParam{ type=ULib.cmds.PlayerArg }
-ban:addParam{ type=ULib.cmds.NumArg, hint="minutes, 0 for perma", ULib.cmds.optional, ULib.cmds.allowTimeString, min=0 }
-ban:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
+ban:addParam{ type=ULib.cmds.NumArg, hint="分钟，0为永久", ULib.cmds.optional, ULib.cmds.allowTimeString, min=0 }
+ban:addParam{ type=ULib.cmds.StringArg, hint="原因", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
 ban:defaultAccess( ULib.ACCESS_ADMIN )
-ban:help( "Bans target." )
+ban:help( "封禁目标。" )
 
 ------------------------------ BanID ------------------------------
 function ulx.banid( calling_ply, steamid, minutes, reason )
 	steamid = steamid:upper()
 	if not ULib.isValidSteamID( steamid ) then
-		ULib.tsayError( calling_ply, "Invalid steamid." )
+		ULib.tsayError( calling_ply, "无效steamid。" )
 		return
 	end
 
@@ -123,34 +124,34 @@ function ulx.banid( calling_ply, steamid, minutes, reason )
 	end
 
 	if target_ply and (target_ply:IsListenServerHost() or target_ply:IsBot()) then
-		ULib.tsayError( calling_ply, "This player is immune to banning", true )
+		ULib.tsayError( calling_ply, "该玩家对封禁免疫。", true )
 		return
 	end
 
-	local time = "for #s"
-	if minutes == 0 then time = "permanently" end
-	local str = "#A banned steamid #s "
+	local time = "，时长为 #s"
+	if minutes == 0 then time = "，此封禁为永久封禁" end
+	local str = "#A 封禁了SteamID #s "
 	displayid = steamid
 	if name then
-		displayid = displayid .. "(" .. name .. ") "
+		displayid = displayid .. "（" .. name .. "） "
 	end
 	str = str .. time
-	if reason and reason ~= "" then str = str .. " (#4s)" end
+	if reason and reason ~= "" then str = str .. " （#4s）" end
 	ulx.fancyLogAdmin( calling_ply, str, displayid, minutes ~= 0 and ULib.secondsToStringTime( minutes * 60 ) or reason, reason )
 	-- Delay by 1 frame to ensure any chat hook finishes with player intact. Prevents a crash.
 	ULib.queueFunctionCall( ULib.addBan, steamid, minutes, reason, name, calling_ply )
 end
 local banid = ulx.command( CATEGORY_NAME, "ulx banid", ulx.banid, nil, false, false, true )
 banid:addParam{ type=ULib.cmds.StringArg, hint="steamid" }
-banid:addParam{ type=ULib.cmds.NumArg, hint="minutes, 0 for perma", ULib.cmds.optional, ULib.cmds.allowTimeString, min=0 }
-banid:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
+banid:addParam{ type=ULib.cmds.NumArg, hint="分钟，0为永久", ULib.cmds.optional, ULib.cmds.allowTimeString, min=0 }
+banid:addParam{ type=ULib.cmds.StringArg, hint="原因", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
 banid:defaultAccess( ULib.ACCESS_SUPERADMIN )
-banid:help( "Bans steamid." )
+banid:help( "封禁SteamID。" )
 
 function ulx.unban( calling_ply, steamid )
 	steamid = steamid:upper()
 	if not ULib.isValidSteamID( steamid ) then
-		ULib.tsayError( calling_ply, "Invalid steamid." )
+		ULib.tsayError( calling_ply, "无效steamid。" )
 		return
 	end
 
@@ -158,20 +159,20 @@ function ulx.unban( calling_ply, steamid )
 
 	ULib.unban( steamid, calling_ply )
 	if name then
-		ulx.fancyLogAdmin( calling_ply, "#A unbanned steamid #s", steamid .. " (" .. name .. ")" )
+		ulx.fancyLogAdmin( calling_ply, "#A 解封了SteamID #s", steamid .. " （" .. name .. "）" )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A unbanned steamid #s", steamid )
+		ulx.fancyLogAdmin( calling_ply, "#A 解封了SteamID #s", steamid )
 	end
 end
 local unban = ulx.command( CATEGORY_NAME, "ulx unban", ulx.unban, nil, false, false, true )
 unban:addParam{ type=ULib.cmds.StringArg, hint="steamid" }
 unban:defaultAccess( ULib.ACCESS_ADMIN )
-unban:help( "Unbans steamid." )
+unban:help( "解封SteamID。" )
 
 ------------------------------ Noclip ------------------------------
 function ulx.noclip( calling_ply, target_plys )
 	if not target_plys[ 1 ]:IsValid() then
-		Msg( "You are god, you are not constrained by walls built by mere mortals.\n" )
+		Msg( "你是神，你不会被凡人所造的墙限制住。\n" )
 		return
 	end
 
@@ -180,7 +181,7 @@ function ulx.noclip( calling_ply, target_plys )
 		local v = target_plys[ i ]
 
 		if v.NoNoclip then
-			ULib.tsayError( calling_ply, v:Nick() .. " can't be noclipped right now.", true )
+			ULib.tsayError( calling_ply, "目前无法为 " .. v:Nick() .. " 启用穿墙模式。", true )
 		else
 			if v:GetMoveType() == MOVETYPE_WALK then
 				v:SetMoveType( MOVETYPE_NOCLIP )
@@ -189,7 +190,7 @@ function ulx.noclip( calling_ply, target_plys )
 				v:SetMoveType( MOVETYPE_WALK )
 				table.insert( affected_plys, v )
 			else -- Ignore if they're an observer
-				ULib.tsayError( calling_ply, v:Nick() .. " can't be noclipped right now.", true )
+				ULib.tsayError( calling_ply, "目前无法为 " .. v:Nick() .. " 启用穿墙模式。", true )
 			end
 		end
 	end
@@ -197,11 +198,11 @@ end
 local noclip = ulx.command( CATEGORY_NAME, "ulx noclip", ulx.noclip, "!noclip" )
 noclip:addParam{ type=ULib.cmds.PlayersArg, ULib.cmds.optional }
 noclip:defaultAccess( ULib.ACCESS_ADMIN )
-noclip:help( "Toggles noclip on target(s)." )
+noclip:help( "为目标切换穿墙模式。" )
 
 function ulx.spectate( calling_ply, target_ply )
 	if not calling_ply:IsValid() then
-		Msg( "You can't spectate from dedicated server console.\n" )
+		Msg( "你无法从专用服务器控制台观察。\n" )
 		return
 	end
 
@@ -235,7 +236,7 @@ function ulx.spectate( calling_ply, target_ply )
 
 		if player.ULXHasGod then player:GodEnable() end -- Restore if player had ulx god.
 		player:UnSpectate() -- Need this for DarkRP for some reason, works fine without it in sbox
-		ulx.fancyLogAdmin( calling_ply, true, "#A stopped spectating #T", target_ply )
+		ulx.fancyLogAdmin( calling_ply, true, "#A 停止观察了 #T", target_ply )
 		ulx.clearExclusive( calling_ply )
 	end
 	hook.Add( "PlayerSpawn", "ulx_unspectatedspawn_" .. calling_ply:EntIndex(), stopSpectate, HOOK_MONITOR_HIGH )
@@ -265,15 +266,15 @@ function ulx.spectate( calling_ply, target_ply )
 	calling_ply:SpectateEntity( target_ply )
 	calling_ply:StripWeapons() -- Otherwise they can use weapons while spectating
 
-	ULib.tsay( calling_ply, "To get out of spectate, move forward.", true )
+	ULib.tsay( calling_ply, "要离开观察模式，向前走。", true )
 	ulx.setExclusive( calling_ply, "spectating" )
 
-	ulx.fancyLogAdmin( calling_ply, true, "#A began spectating #T", target_ply )
+	ulx.fancyLogAdmin( calling_ply, true, "#A 开始观察 #T", target_ply )
 end
 local spectate = ulx.command( CATEGORY_NAME, "ulx spectate", ulx.spectate, "!spectate", true )
 spectate:addParam{ type=ULib.cmds.PlayerArg, target="!^" }
 spectate:defaultAccess( ULib.ACCESS_ADMIN )
-spectate:help( "Spectate target." )
+spectate:help( "观察目标。" )
 
 function ulx.addForcedDownload( path )
 	if ULib.fileIsDir( path ) then
@@ -284,17 +285,17 @@ function ulx.addForcedDownload( path )
 	elseif ULib.fileExists( path ) then
 		resource.AddFile( path )
 	else
-		Msg( "[ULX] ERROR: Tried to add nonexistent or empty file to forced downloads '" .. path .. "'\n" )
+		Msg( "[ULX] 错误：尝试将不存在或空的文件添加到强制下载列表 '" .. path .. "'\n" )
 	end
 end
 
 function ulx.debuginfo( calling_ply )
-	local str = string.format( "ULX version: %s\nULib version: %s\n", ULib.pluginVersionStr( "ULX" ), ULib.pluginVersionStr( "ULib" ) )
-	str = str .. string.format( "Gamemode: %s\nMap: %s\n", GAMEMODE.Name, game.GetMap() )
-	str = str .. "Dedicated server: " .. tostring( game.IsDedicated() ) .. "\n\n"
+	local str = string.format( "ULX版本：%s\nULib版本：%s\n", ULib.pluginVersionStr( "ULX" ), ULib.pluginVersionStr( "ULib" ) )
+	str = str .. string.format( "游戏模式：%s\n地图：%s\n", GAMEMODE.Name, game.GetMap() )
+	str = str .. "专用服务器：" .. tostring( game.IsDedicated() ) .. "\n\n"
 
 	local players = player.GetAll()
-	str = str .. string.format( "Currently connected players:\nNick%s steamid%s uid%s id lsh\n", str.rep( " ", 27 ), str.rep( " ", 12 ), str.rep( " ", 7 ) )
+	str = str .. string.format( "当前连接的玩家：\昵称%s steamid%s uid%s id 服主\n", str.rep( " ", 27 ), str.rep( " ", 12 ), str.rep( " ", 7 ) )
 	for _, ply in ipairs( players ) do
 		local id = string.format( "%i", ply:EntIndex() )
 		local steamid = ply:SteamID()
@@ -306,9 +307,9 @@ function ulx.debuginfo( calling_ply )
 		plyline = plyline .. uid .. str.rep( " ", 11 - uid:len() ) -- Steamid
 		plyline = plyline .. id .. str.rep( " ", 3 - id:len() ) -- id
 		if ply:IsListenServerHost() then
-			plyline = plyline .. "y	  "
+			plyline = plyline .. "是	  "
 		else
-			plyline = plyline .. "n	  "
+			plyline = plyline .. "否	  "
 		end
 
 		str = str .. plyline .. "\n"
@@ -318,20 +319,20 @@ function ulx.debuginfo( calling_ply )
 	str = str .. "\n\nULib.ucl.users (#=" .. table.Count( ULib.ucl.users ) .. "):\n" .. ulx.dumpTable( ULib.ucl.users, 1 ) .. "\n\n"
 	str = str .. "ULib.ucl.groups (#=" .. table.Count( ULib.ucl.groups ) .. "):\n" .. ulx.dumpTable( ULib.ucl.groups, 1 ) .. "\n\n"
 	str = str .. "ULib.ucl.authed (#=" .. table.Count( ULib.ucl.authed ) .. "):\n" .. ulx.dumpTable( ULib.ucl.authed, 1 ) .. "\n\n"
-	str = str .. "Garrysmod default file (#=" .. table.Count( gmoddefault ) .. "):\n" .. ulx.dumpTable( gmoddefault, 1 ) .. "\n\n"
+	str = str .. "Garrysmod默认文件 (#=" .. table.Count( gmoddefault ) .. "):\n" .. ulx.dumpTable( gmoddefault, 1 ) .. "\n\n"
 
-	str = str .. "Active workshop addons on this server:\n"
+	str = str .. "此服务器上的创意工坊插件：\n"
 	local addons = engine.GetAddons()
 	for i=1, #addons do
 		local addon = addons[i]
 		if addon.mounted then
 			local name = utf8.force( addon.title )
-			str = str .. string.format( "%s%s workshop ID %s\n", name, str.rep( " ", 32 - utf8.len( name ) ), addon.file:gsub( "%D", "" ) )
+			str = str .. string.format( "%s%s 创意工坊ID %s\n", name, str.rep( " ", 32 - utf8.len( name ) ), addon.file:gsub( "%D", "" ) )
 		end
 	end
 	str = str .. "\n"
 
-	str = str .. "Active legacy addons on this server:\n"
+	str = str .. "此服务器上的传统插件：\n"
 	local _, possibleaddons = file.Find( "addons/*", "GAME" )
 	for _, addon in ipairs( possibleaddons ) do
 		if not ULib.findInTable( {"checkers", "chess", "common", "go", "hearts", "spades"}, addon:lower() ) then -- Not sure what these addon folders are
@@ -352,30 +353,30 @@ function ulx.debuginfo( calling_ply )
 			name = utf8.force( name )
 			str = str .. name .. str.rep( " ", 32 - utf8.len( name ) )
 			if author then
-				str = string.format( "%s by %s%s", str, author, version and "," or "" )
+				str = string.format( "%s 的 %s%s", author, str, version and "," or "" )
 			end
 
 			if version then
-				str = str .. " version " .. version
+				str = str .. " 版本 " .. version
 			end
 
 			if date then
-				str = string.format( "%s (%s)", str, date )
+				str = string.format( "%s （%s）", str, date )
 			end
 			str = str .. "\n"
 		end
 	end
 
 	ULib.fileWrite( "data/ulx/debugdump.txt", str )
-	Msg( "Debug information written to garrysmod/data/ulx/debugdump.txt on server.\n" )
+	Msg( "调试信息输出到了服务器上的garrysmod/data/ulx/debugdump.txt。\n" )
 end
 local debuginfo = ulx.command( CATEGORY_NAME, "ulx debuginfo", ulx.debuginfo )
-debuginfo:help( "Dump some debug information." )
+debuginfo:help( "输出服务器调试信息。" )
 
 function ulx.resettodefaults( calling_ply, param )
 	if param ~= "FORCE" then
-		local str = "Are you SURE about this? It will remove ulx-created temporary bans, configs, groups, EVERYTHING!"
-		local str2 = "If you're sure, type \"ulx resettodefaults FORCE\""
+		local str = "你确定要这么做吗？它会移除ULX创建的临时封建、配置、用户组，全部！"
+		local str2 = "如果你确定，输入\"ulx resettodefaults FORCE\""
 		if calling_ply:IsValid() then
 			ULib.tsayError( calling_ply, str, true )
 			ULib.tsayError( calling_ply, str2, true )
@@ -398,23 +399,23 @@ function ulx.resettodefaults( calling_ply, param )
 	ULib.fileDelete( "data/ulib/misc_registered.txt" )
 	ULib.fileDelete( "data/ulib/users.txt" )
 
-	local str = "Please change levels to finish the reset"
+	local str = "请更换地图来完成重置"
 	if calling_ply:IsValid() then
 		ULib.tsayError( calling_ply, str, true )
 	else
 		Msg( str .. "\n" )
 	end
 
-	ulx.fancyLogAdmin( calling_ply, "#A reset all ULX and ULib configuration" )
+	ulx.fancyLogAdmin( calling_ply, "#A 重置了所有ULX和ULib配置" )
 end
 local resettodefaults = ulx.command( CATEGORY_NAME, "ulx resettodefaults", ulx.resettodefaults )
 resettodefaults:addParam{ type=ULib.cmds.StringArg, ULib.cmds.optional }
-resettodefaults:help( "Resets ALL ULX and ULib configuration!" )
+resettodefaults:help( "重置所有ULX和ULib配置" )
 
 if SERVER then
-	local ulx_kickAfterNameChanges = 			ulx.convar( "kickAfterNameChanges", "0", "<number> - Players can only change their name x times every ulx_kickAfterNameChangesCooldown seconds. 0 to disable.", ULib.ACCESS_ADMIN )
-	local ulx_kickAfterNameChangesCooldown = 	ulx.convar( "kickAfterNameChangesCooldown", "60", "<time> - Players can change their name ulx_kickAfterXNameChanges times every x seconds.", ULib.ACCESS_ADMIN )
-	local ulx_kickAfterNameChangesWarning = 	ulx.convar( "kickAfterNameChangesWarning", "1", "<1/0> - Display a warning to users to let them know how many more times they can change their name.", ULib.ACCESS_ADMIN )
+	local ulx_kickAfterNameChanges = 			ulx.convar( "kickAfterNameChanges", "0", "<number> - 玩家每 ulx_kickAfterNameChangesCooldown 秒能更改 x 次名字。0为禁用。", ULib.ACCESS_ADMIN )
+	local ulx_kickAfterNameChangesCooldown = 	ulx.convar( "kickAfterNameChangesCooldown", "60", "<time> - 玩家每 x 秒能更改 ulx_kickAfterXNameChanges 次名字。", ULib.ACCESS_ADMIN )
+	local ulx_kickAfterNameChangesWarning = 	ulx.convar( "kickAfterNameChangesWarning", "1", "<1/0> - 给玩家显示警告让他们知道他们能更改多少次名字。", ULib.ACCESS_ADMIN )
 	ulx.nameChangeTable = ulx.nameChangeTable or {}
 
 	local function checkNameChangeLimit( ply, oldname, newname )
@@ -438,10 +439,10 @@ if SERVER then
 			local curAttempts = #ulx.nameChangeTable[ply:SteamID()]
 
 			if curAttempts >= maxAttempts then
-				ULib.kick( ply, "Changed name too many times" )
+				ULib.kick( ply, "更改了过多次名字" )
 			else
 				if showWarning == 1 then
-					ULib.tsay( ply, "Warning: You have changed your name " .. curAttempts .. " out of " .. maxAttempts .. " time" .. ( maxAttempts ~= 1 and "s" ) .. " in the past " .. duration .. " second" .. ( duration ~= 1 and "s" ) )
+					ULib.tsay( ply, "警告：过去的" .. duration .. "秒中，你已经更改了 " .. curAttempts .. " 次名字，最多" .. maxAttempts .. " 次" )
 				end
 			end
 		end
@@ -470,7 +471,7 @@ local function playerPickup( ply, ent )
 	end
 end
 hook.Add( "PhysgunPickup", "ulxPlayerPickup", playerPickup, HOOK_HIGH ) -- Allow admins to move players. Call before the prop protection hook.
-if SERVER then ULib.ucl.registerAccess( "ulx physgunplayer", ULib.ACCESS_ADMIN, "Ability to physgun other players", "Other" ) end
+if SERVER then ULib.ucl.registerAccess( "ulx physgunplayer", ULib.ACCESS_ADMIN, "使用物理枪拖动其他玩家的能力", "其它" ) end
 
 local function playerDrop( ply, ent )
 	if ent:GetClass() == "player" then

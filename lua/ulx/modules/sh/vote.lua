@@ -1,4 +1,4 @@
-local CATEGORY_NAME = "Voting"
+local CATEGORY_NAME = "投票"
 
 ---------------
 --Public vote--
@@ -12,12 +12,12 @@ end
 function ulx.doVote( title, options, callback, timeout, filter, noecho, ... )
 	timeout = timeout or 20
 	if ulx.voteInProgress then
-		Msg( "Error! ULX tried to start a vote when another vote was in progress!\n" )
+		Msg( "错误！ULX在其它投票进行时尝试开始新的投票！\n" )
 		return false
 	end
 
 	if not options[ 1 ] or not options[ 2 ] then
-		Msg( "Error! ULX tried to start a vote without at least two options!\n" )
+		Msg( "错误！ULX尝试开始选项少于2个的投票\n" )
 		return false
 	end
 
@@ -50,17 +50,17 @@ end
 
 function ulx.voteCallback( ply, command, argv )
 	if not ulx.voteInProgress then
-		ULib.tsayError( ply, "There is not a vote in progress" )
+		ULib.tsayError( ply, "当前没有进行中的投票。" )
 		return
 	end
 
 	if not argv[ 1 ] or not tonumber( argv[ 1 ] ) or not ulx.voteInProgress.options[ tonumber( argv[ 1 ] ) ] then
-		ULib.tsayError( ply, "Invalid or out of range vote." )
+		ULib.tsayError( ply, "无效或超出范围投票。" )
 		return
 	end
 
 	if ply.ulxVoted then
-		ULib.tsayError( ply, "You have already voted!" )
+		ULib.tsayError( ply, "你已经投过票了！" )
 		return
 	end
 
@@ -73,7 +73,7 @@ function ulx.voteCallback( ply, command, argv )
 
 	ply.ulxVoted = true -- Tag them as having voted
 
-	local str = ply:Nick() .. " voted for: " .. ulx.voteInProgress.options[ id ]
+	local str = ply:Nick() .. " 投了： " .. ulx.voteInProgress.options[ id ]
 	if echo and not ulx.voteInProgress.noecho then
 		ULib.tsay( _, str ) -- TODO, color?
 	end
@@ -118,9 +118,9 @@ local function voteDone( t )
 
 	local str
 	if not winner then
-		str = "Vote results: No option won because no one voted!"
+		str = "投票结果：没有选项胜出，因为没人投票。"
 	else
-		str = "Vote results: Option '" .. t.options[ winner ] .. "' won. (" .. winnernum .. "/" .. t.voters .. ")"
+		str = "投票结果：选项 '" .. t.options[ winner ] .. "' 胜利。（" .. winnernum .. "/" .. t.voters .. "）"
 	end
 	ULib.tsay( _, str ) -- TODO, color?
 	ulx.logString( str )
@@ -129,41 +129,41 @@ end
 
 function ulx.vote( calling_ply, title, ... )
 	if ulx.voteInProgress then
-		ULib.tsayError( calling_ply, "There is already a vote in progress. Please wait for the current one to end.", true )
+		ULib.tsayError( calling_ply, "目前已经有投票正在进行。请等待当前投票结束。", true )
 		return
 	end
 
 	ulx.doVote( title, { ... }, voteDone )
-	ulx.fancyLogAdmin( calling_ply, "#A started a vote (#s)", title )
+	ulx.fancyLogAdmin( calling_ply, "#A 开始了投票（#s）", title )
 end
 local vote = ulx.command( CATEGORY_NAME, "ulx vote", ulx.vote, "!vote" )
-vote:addParam{ type=ULib.cmds.StringArg, hint="title" }
-vote:addParam{ type=ULib.cmds.StringArg, hint="options", ULib.cmds.takeRestOfLine, repeat_min=2, repeat_max=10 }
+vote:addParam{ type=ULib.cmds.StringArg, hint="标题" }
+vote:addParam{ type=ULib.cmds.StringArg, hint="选项", ULib.cmds.takeRestOfLine, repeat_min=2, repeat_max=10 }
 vote:defaultAccess( ULib.ACCESS_ADMIN )
-vote:help( "Starts a public vote." )
+vote:help( "开始公共投票。" )
 
 -- Stop a vote in progress
 function ulx.stopVote( calling_ply )
 	if not ulx.voteInProgress then
-		ULib.tsayError( calling_ply, "There is no vote currently in progress.", true )
+		ULib.tsayError( calling_ply, "当前没有投票正在进行。", true )
 		return
 	end
 
 	ulx.voteDone( true )
-	ulx.fancyLogAdmin( calling_ply, "#A has stopped the current vote." )
+	ulx.fancyLogAdmin( calling_ply, "#A 停止了当前投票。" )
 end
 local stopvote = ulx.command( CATEGORY_NAME, "ulx stopvote", ulx.stopVote, "!stopvote" )
 stopvote:defaultAccess( ULib.ACCESS_SUPERADMIN )
-stopvote:help( "Stops a vote in progress." )
+stopvote:help( "停止正在进行的投票。" )
 
 local function voteMapDone2( t, changeTo, ply )
 	local shouldChange = false
 
 	if t.results[ 1 ] and t.results[ 1 ] > 0 then
-		ulx.logServAct( ply, "#A approved the votemap" )
+		ulx.logServAct( ply, "#A 通过了换图投票" )
 		shouldChange = true
 	else
-		ulx.logServAct( ply, "#A denied the votemap" )
+		ulx.logServAct( ply, "#A 拒绝了换图投票" )
 	end
 
 	if shouldChange then
@@ -194,13 +194,13 @@ local function voteMapDone( t, argv, ply )
 	end
 
 	if (#argv < 2 and winner ~= 1) or not winner or winnernum < minVotes or winnernum / t.voters < ratioNeeded then
-		str = "Vote results: Vote was unsuccessful."
+		str = "投票结果：投票并不成功。"
 	elseif ply:IsValid() then
-		str = "Vote results: Option '" .. t.options[ winner ] .. "' won, changemap pending approval. (" .. winnernum .. "/" .. t.voters .. ")"
+		str = "投票结果：选项 '" .. t.options[ winner ] .. "' 胜出，等待通过换图。（" .. winnernum .. "/" .. t.voters .. "）"
 
-		ulx.doVote( "Accept result and changemap to " .. changeTo .. "?", { "Yes", "No" }, voteMapDone2, 30000, { ply }, true, changeTo, ply )
+		ulx.doVote( "接受投票结果并将地图换为 " .. changeTo .. "？", { "是", "否" }, voteMapDone2, 30000, { ply }, true, changeTo, ply )
 	else -- It's the server console, let's roll with it
-		str = "Vote results: Option '" .. t.options[ winner ] .. "' won. (" .. winnernum .. "/" .. t.voters .. ")"
+		str = "投票结果：选项 '" .. t.options[ winner ] .. "' 胜出。（" .. winnernum .. "/" .. t.voters .. "）"
 		ULib.tsay( _, str )
 		ulx.logString( str )
 		ULib.consoleCommand( "changelevel " .. changeTo .. "\n" )
@@ -216,29 +216,29 @@ function ulx.votemap2( calling_ply, ... )
 	local argv = { ... }
 
 	if ulx.voteInProgress then
-		ULib.tsayError( calling_ply, "There is already a vote in progress. Please wait for the current one to end.", true )
+		ULib.tsayError( calling_ply, "目前已经有投票正在进行。请等待当前投票结束。", true )
 		return
 	end
 
 	for i=2, #argv do
 	    if ULib.findInTable( argv, argv[ i ], 1, i-1 ) then
-	        ULib.tsayError( calling_ply, "Map " .. argv[ i ] .. " was listed twice. Please try again" )
+	        ULib.tsayError( calling_ply, "地图 " .. argv[ i ] .. " 出现了两次。请再试一次" )
 	        return
 	    end
 	end
 
 	if #argv > 1 then
-		ulx.doVote( "Change map to..", argv, voteMapDone, _, _, _, argv, calling_ply )
-		ulx.fancyLogAdmin( calling_ply, "#A started a votemap with options" .. string.rep( " #s", #argv ), ... )
+		ulx.doVote( "将地图更改为..", argv, voteMapDone, _, _, _, argv, calling_ply )
+		ulx.fancyLogAdmin( calling_ply, "#A 开始了地图投票，选项有" .. string.rep( " #s", #argv ), ... )
 	else
-		ulx.doVote( "Change map to " .. argv[ 1 ] .. "?", { "Yes", "No" }, voteMapDone, _, _, _, argv, calling_ply )
-		ulx.fancyLogAdmin( calling_ply, "#A started a votemap for #s", argv[ 1 ] )
+		ulx.doVote( "将地图更改为 " .. argv[ 1 ] .. "？", { "是", "否" }, voteMapDone, _, _, _, argv, calling_ply )
+		ulx.fancyLogAdmin( calling_ply, "#A 投票将地图换为 #s", argv[ 1 ] )
 	end
 end
 local votemap2 = ulx.command( CATEGORY_NAME, "ulx votemap2", ulx.votemap2, "!votemap2" )
-votemap2:addParam{ type=ULib.cmds.StringArg, completes=ulx.maps, hint="map", error="invalid map \"%s\" specified", ULib.cmds.restrictToCompletes, ULib.cmds.takeRestOfLine, repeat_min=1, repeat_max=10 }
+votemap2:addParam{ type=ULib.cmds.StringArg, completes=ulx.maps, hint="地图", error="指定的地图 \"%s\" 无效", ULib.cmds.restrictToCompletes, ULib.cmds.takeRestOfLine, repeat_min=1, repeat_max=10 }
 votemap2:defaultAccess( ULib.ACCESS_ADMIN )
-votemap2:help( "Starts a public map vote." )
+votemap2:help( "开始一个公开的换图投票。" )
 if SERVER then ulx.convar( "votemap2Successratio", "0.5", _, ULib.ACCESS_ADMIN ) end -- The ratio needed for a votemap2 to succeed
 if SERVER then ulx.convar( "votemap2Minvotes", "3", _, ULib.ACCESS_ADMIN ) end -- Minimum votes needed for votemap2
 
@@ -248,17 +248,17 @@ local function voteKickDone2( t, target, time, ply, reason )
 	local shouldKick = false
 
 	if t.results[ 1 ] and t.results[ 1 ] > 0 then
-		ulx.logUserAct( ply, target, "#A approved the votekick against #T (" .. (reason or "") .. ")" )
+		ulx.logUserAct( ply, target, "#A 通过了对 #T 的投票踢出（" .. (reason or "") .. "）" )
 		shouldKick = true
 	else
-		ulx.logUserAct( ply, target, "#A denied the votekick against #T" )
+		ulx.logUserAct( ply, target, "#A 拒绝了对 #T 的投票踢出" )
 	end
 
 	if shouldKick then
 		if reason and reason ~= "" then
-			ULib.kick( target, "Vote kick successful. (" .. reason .. ")" )
+			ULib.kick( target, "投票踢出成功。（" .. reason .. "）" )
 		else
-			ULib.kick( target, "Vote kick successful." )
+			ULib.kick( target, "投票踢出成功。" )
 		end
 	end
 end
@@ -278,16 +278,16 @@ local function voteKickDone( t, target, time, ply, reason )
 	local minVotes = GetConVarNumber( "ulx_votekickMinvotes" )
 	local str
 	if winner ~= 1 or winnernum < minVotes or winnernum / t.voters < ratioNeeded then
-		str = "Vote results: User will not be kicked. (" .. (results[ 1 ] or "0") .. "/" .. t.voters .. ")"
+		str = "投票结果：用户不会被踢出。（" .. (results[ 1 ] or "0") .. "/" .. t.voters .. "）"
 	else
 		if not target:IsValid() then
-			str = "Vote results: User voted to be kicked, but has already left."
+			str = "投票结果：用户被投票踢出，但其已经离开。"
 		elseif ply:IsValid() then
-			str = "Vote results: User will now be kicked, pending approval. (" .. winnernum .. "/" .. t.voters .. ")"
-			ulx.doVote( "Accept result and kick " .. target:Nick() .. "?", { "Yes", "No" }, voteKickDone2, 30000, { ply }, true, target, time, ply, reason )
+			str = "投票结果：用户将会被踢出，等待通过。（" .. winnernum .. "/" .. t.voters .. "）"
+			ulx.doVote( "接受结果并踢出 " .. target:Nick() .. "？", { "是", "否" }, voteKickDone2, 30000, { ply }, true, target, time, ply, reason )
 		else -- Vote from server console, roll with it
-			str = "Vote results: User will now be kicked. (" .. winnernum .. "/" .. t.voters .. ")"
-			ULib.kick( target, "Vote kick successful." )
+			str = "投票结果：用户将会被踢出。（" .. winnernum .. "/" .. t.voters .. "）"
+			ULib.kick( target, "投票踢出成功。" )
 		end
 	end
 
@@ -298,32 +298,32 @@ end
 
 function ulx.votekick( calling_ply, target_ply, reason )
 	if target_ply:IsListenServerHost() then
-		ULib.tsayError( calling_ply, "This player is immune to kicking", true )
+		ULib.tsayError( calling_ply, "该玩家免疫踢出", true )
 		return
 	end
 
 	if ulx.voteInProgress then
-		ULib.tsayError( calling_ply, "There is already a vote in progress. Please wait for the current one to end.", true )
+		ULib.tsayError( calling_ply, "目前已经有投票正在进行。请等待当前投票结束。", true )
 		return
 	end
 
-	local msg = "Kick " .. target_ply:Nick() .. "?"
+	local msg = "踢出 " .. target_ply:Nick() .. "？"
 	if reason and reason ~= "" then
 		msg = msg .. " (" .. reason .. ")"
 	end
 
-	ulx.doVote( msg, { "Yes", "No" }, voteKickDone, _, _, _, target_ply, time, calling_ply, reason )
+	ulx.doVote( msg, { "是", "否" }, voteKickDone, _, _, _, target_ply, time, calling_ply, reason )
 	if reason and reason ~= "" then
-		ulx.fancyLogAdmin( calling_ply, "#A started a votekick against #T (#s)", target_ply, reason )
+		ulx.fancyLogAdmin( calling_ply, "#A 开始了对 #T 的投票踢出（#s）", target_ply, reason )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A started a votekick against #T", target_ply )
+		ulx.fancyLogAdmin( calling_ply, "#A 开始了对 #T 的投票踢出", target_ply )
 	end
 end
 local votekick = ulx.command( CATEGORY_NAME, "ulx votekick", ulx.votekick, "!votekick" )
 votekick:addParam{ type=ULib.cmds.PlayerArg }
-votekick:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
+votekick:addParam{ type=ULib.cmds.StringArg, hint="原因", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
 votekick:defaultAccess( ULib.ACCESS_ADMIN )
-votekick:help( "Starts a public kick vote against target." )
+votekick:help( "开始一个针对目标的投票踢出。" )
 if SERVER then ulx.convar( "votekickSuccessratio", "0.6", _, ULib.ACCESS_ADMIN ) end -- The ratio needed for a votekick to succeed
 if SERVER then ulx.convar( "votekickMinvotes", "2", _, ULib.ACCESS_ADMIN ) end -- Minimum votes needed for votekick
 
@@ -333,10 +333,10 @@ local function voteBanDone2( t, nick, steamid, time, ply, reason )
 	local shouldBan = false
 
 	if t.results[ 1 ] and t.results[ 1 ] > 0 then
-		ulx.fancyLogAdmin( ply, "#A approved the voteban against #s (#s minutes) (#s))", nick, time, reason or "" )
+		ulx.fancyLogAdmin( ply, "#A 通过了对 #s 的投票封禁（#s 分钟） （#s）", nick, time, reason or "" )
 		shouldBan = true
 	else
-		ulx.fancyLogAdmin( ply, "#A denied the voteban against #s", nick )
+		ulx.fancyLogAdmin( ply, "#A 拒绝了对 #s 的投票封禁", nick )
 	end
 
 	if shouldBan then
@@ -359,14 +359,14 @@ local function voteBanDone( t, nick, steamid, time, ply, reason )
 	local minVotes = GetConVarNumber( "ulx_votebanMinvotes" )
 	local str
 	if winner ~= 1 or winnernum < minVotes or winnernum / t.voters < ratioNeeded then
-		str = "Vote results: User will not be banned. (" .. (results[ 1 ] or "0") .. "/" .. t.voters .. ")"
+		str = "投票结果：用户不会被封禁。（" .. (results[ 1 ] or "0") .. "/" .. t.voters .. "）"
 	else
-		reason = ("[ULX Voteban] " .. (reason or "")):Trim()
+		reason = ("[ULX投票封禁] " .. (reason or "")):Trim()
 		if ply:IsValid() then
-			str = "Vote results: User will now be banned, pending approval. (" .. winnernum .. "/" .. t.voters .. ")"
-			ulx.doVote( "Accept result and ban " .. nick .. "?", { "Yes", "No" }, voteBanDone2, 30000, { ply }, true, nick, steamid, time, ply, reason )
+			str = "投票结果：用户将会被封禁，等待通过。（" .. winnernum .. "/" .. t.voters .. "）"
+			ulx.doVote( "接受结果并封禁 " .. nick .. "？", { "是", "否" }, voteBanDone2, 30000, { ply }, true, nick, steamid, time, ply, reason )
 		else -- Vote from server console, roll with it
-			str = "Vote results: User will now be banned. (" .. winnernum .. "/" .. t.voters .. ")"
+			str = "投票结果：用户将会被封禁。（" .. winnernum .. "/" .. t.voters .. "）"
 			ULib.addBan( steamid, time, reason, nick, ply )
 		end
 	end
@@ -378,43 +378,43 @@ end
 
 function ulx.voteban( calling_ply, target_ply, minutes, reason )
 	if target_ply:IsListenServerHost() or target_ply:IsBot() then
-		ULib.tsayError( calling_ply, "This player is immune to banning", true )
+		ULib.tsayError( calling_ply, "该玩家免疫封禁", true )
 		return
 	end
 
 	if ulx.voteInProgress then
-		ULib.tsayError( calling_ply, "There is already a vote in progress. Please wait for the current one to end.", true )
+		ULib.tsayError( calling_ply, "目前已经有投票正在进行。请等待当前投票结束。", true )
 		return
 	end
 
-	local msg = "Ban " .. target_ply:Nick() .. " for " .. minutes .. " minutes?"
+	local msg = "将 " .. target_ply:Nick() .. " 封禁 " .. minutes .. " 分钟？"
 	if reason and reason ~= "" then
-		msg = msg .. " (" .. reason .. ")"
+		msg = msg .. " （" .. reason .. "）"
 	end
 
-	ulx.doVote( msg, { "Yes", "No" }, voteBanDone, _, _, _, target_ply:Nick(), target_ply:SteamID(), minutes, calling_ply, reason )
+	ulx.doVote( msg, { "是", "否" }, voteBanDone, _, _, _, target_ply:Nick(), target_ply:SteamID(), minutes, calling_ply, reason )
 	if reason and reason ~= "" then
-		ulx.fancyLogAdmin( calling_ply, "#A started a voteban of #i minute(s) against #T (#s)", minutes, target_ply, reason )
+		ulx.fancyLogAdmin( calling_ply, "#A 开始了将 #T 封禁 #i 分钟的投票（#s）", target_ply, minutes, reason )
 	else
-		ulx.fancyLogAdmin( calling_ply, "#A started a voteban of #i minute(s) against #T", minutes, target_ply )
+		ulx.fancyLogAdmin( calling_ply, "#A 开始了将 #T 封禁 #i 分钟的投票", target_ply, minutes )
 	end
 end
 local voteban = ulx.command( CATEGORY_NAME, "ulx voteban", ulx.voteban, "!voteban" )
 voteban:addParam{ type=ULib.cmds.PlayerArg }
-voteban:addParam{ type=ULib.cmds.NumArg, min=0, default=1440, hint="minutes", ULib.cmds.allowTimeString, ULib.cmds.optional }
-voteban:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
+voteban:addParam{ type=ULib.cmds.NumArg, min=0, default=1440, hint="分钟", ULib.cmds.allowTimeString, ULib.cmds.optional }
+voteban:addParam{ type=ULib.cmds.StringArg, hint="原因", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
 voteban:defaultAccess( ULib.ACCESS_ADMIN )
-voteban:help( "Starts a public ban vote against target." )
+voteban:help( "开始一个针对目标的公开封禁投票。" )
 if SERVER then ulx.convar( "votebanSuccessratio", "0.7", _, ULib.ACCESS_ADMIN ) end -- The ratio needed for a voteban to succeed
 if SERVER then ulx.convar( "votebanMinvotes", "3", _, ULib.ACCESS_ADMIN ) end -- Minimum votes needed for voteban
 
 -- Our regular votemap command
 local votemap = ulx.command( CATEGORY_NAME, "ulx votemap", ulx.votemap, "!votemap" )
-votemap:addParam{ type=ULib.cmds.StringArg, completes=ulx.votemaps, hint="map", ULib.cmds.takeRestOfLine, ULib.cmds.optional }
+votemap:addParam{ type=ULib.cmds.StringArg, completes=ulx.votemaps, hint="地图", ULib.cmds.takeRestOfLine, ULib.cmds.optional }
 votemap:defaultAccess( ULib.ACCESS_ALL )
-votemap:help( "Vote for a map, no args lists available maps." )
+votemap:help( "为一个地图投票，不带参数则显示可用地图。" )
 
 -- Our veto command
 local veto = ulx.command( CATEGORY_NAME, "ulx veto", ulx.votemapVeto, "!veto" )
 veto:defaultAccess( ULib.ACCESS_ADMIN )
-veto:help( "Veto a successful votemap." )
+veto:help( "否决一个成功的投票换图。" )
